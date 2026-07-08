@@ -32,7 +32,7 @@
             </div>
 
             <h1 class="text-4xl font-bold text-white mb-3">Mochin-Kuis</h1>
-            <p class="text-blue-200 text-lg mb-8">Platform Kuis Online Akademik</p>
+            <p class="text-blue-200 text-lg mb-8">Media Ujian Online Perkuliahan</p>
 
             <div class="space-y-4 text-left max-w-xs mx-auto">
                 <div class="flex items-start gap-3">
@@ -87,7 +87,7 @@
                     </svg>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900">Mochin-Kuis</h1>
-                <p class="text-gray-500 text-sm">Platform Kuis Online Akademik</p>
+                <p class="text-gray-500 text-sm">Media Ujian Online Perkuliahan</p>
             </div>
             {{ $slot }}
         </div>
