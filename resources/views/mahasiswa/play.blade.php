@@ -65,16 +65,16 @@
         }">
 
         {{-- Header Card --}}
-        <div class="bg-white rounded-2xl border border-gray-200 p-5 mb-4 shadow-sm">
+        <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-5 mb-3 sm:mb-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-lg font-bold text-gray-900">{{ $quiz->title }}</h1>
+                    <h1 class="text-sm sm:text-lg font-bold text-gray-900">{{ $quiz->title }}</h1>
                     <p class="text-sm text-gray-500 mt-0.5">Soal <span class="font-semibold text-blue-900">{{ $currentNumber }}</span> dari <span class="font-semibold">{{ $totalQuestions }}</span></p>
                 </div>
                 <div class="text-center">
-                    <div class="w-16 h-16 rounded-full border-4 flex items-center justify-center"
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 flex items-center justify-center"
                         :class="timeLeft <= 5 ? 'border-red-500' : (timeLeft <= 10 ? 'border-yellow-500' : 'border-blue-900')">
-                        <span class="text-xl font-bold" :class="timerTextColor" x-text="timeLeft"></span>
+                        <span class="text-base sm:text-xl font-bold" :class="timerTextColor" x-text="timeLeft"></span>
                     </div>
                     <p class="text-xs text-gray-400 mt-1">detik</p>
                 </div>
@@ -98,31 +98,31 @@
         </div>
 
         {{-- Question --}}
-        <div class="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm">
             <div class="flex items-start gap-3">
                 <span class="shrink-0 w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center text-sm font-bold">{{ $currentNumber }}</span>
-                <p class="text-lg text-gray-900 font-medium leading-relaxed">{{ $question->question_text }}</p>
+                <p class="text-sm sm:text-lg text-gray-900 font-medium leading-relaxed">{{ $question->question_text }}</p>
             </div>
         </div>
 
         {{-- Options --}}
-        <div class="space-y-3 mb-6">
+        <div class="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
             @foreach($question->options as $i => $option)
                 <button type="button"
                     @click="selectedOption = {{ $option->id }}"
                     :class="selectedOption === {{ $option->id }}
                         ? 'border-blue-800 bg-blue-50 ring-2 ring-blue-200'
                         : 'border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300'"
-                    class="w-full text-left p-4 rounded-2xl border-2 transition cursor-pointer group"
+                    class="w-full text-left p-3 sm:p-4 rounded-2xl border-2 transition cursor-pointer group"
                     :disabled="submitting">
                     <div class="flex items-center gap-3">
-                        <span class="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold transition"
+                        <span class="shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-semibold transition"
                             :class="selectedOption === {{ $option->id }}
                                 ? 'bg-blue-900 text-white'
                                 : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'">
                             {{ chr(65 + $i) }}
                         </span>
-                        <span class="text-gray-900">{{ $option->option_text }}</span>
+                        <span class="text-sm sm:text-base text-gray-900">{{ $option->option_text }}</span>
                     </div>
                 </button>
             @endforeach

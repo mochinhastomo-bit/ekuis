@@ -1,11 +1,11 @@
 <x-layouts.guest title="Login - Mochin-Kuis">
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Selamat Datang</h2>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 sm:p-8">
+        <div class="mb-4 sm:mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Selamat Datang</h2>
             <p class="text-gray-500 text-sm mt-1">Masuk dengan NIM untuk melanjutkan</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
             <div>
                 <label for="nim" class="block text-sm font-medium text-gray-700 mb-1.5">NIM</label>

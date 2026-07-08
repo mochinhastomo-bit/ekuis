@@ -76,18 +76,18 @@
         </div>
     </div>
 
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-12">
         <div class="w-full max-w-md">
-            <div class="text-center mb-8 lg:hidden">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-900 rounded-xl mb-3">
+            <div class="text-center mb-5 lg:hidden">
+                <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-900 rounded-xl mb-2">
                     <svg class="w-8 h-8 text-white" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M60 15L10 40L60 65L110 40L60 15Z" fill="currentColor"/>
                         <path d="M25 48V78C25 78 42 95 60 95C78 95 95 78 95 78V48" stroke="currentColor" stroke-width="5" fill="none"/>
                         <line x1="110" y1="40" x2="110" y2="85" stroke="currentColor" stroke-width="5"/>
                     </svg>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">Mochin-Kuis</h1>
-                <p class="text-gray-500 text-sm">Media Ujian Online Perkuliahan</p>
+                <h1 class="text-xl font-bold text-gray-900">Mochin-Kuis</h1>
+                <p class="text-gray-500 text-xs">Media Ujian Online Perkuliahan</p>
             </div>
             {{ $slot }}
         </div>
