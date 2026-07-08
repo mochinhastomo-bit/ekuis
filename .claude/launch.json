@@ -1,0 +1,11 @@
+{
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "e-kuis-dev",
+            "runtimeExecutable": "bash",
+            "runtimeArgs": ["-c", "cd /Users/mochinhastomo/Laravel/e-Kuis && composer dev"],
+            "port": 8000
+        }
+    ]
+}
