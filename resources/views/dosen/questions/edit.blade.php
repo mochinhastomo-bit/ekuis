@@ -1,7 +1,14 @@
 <x-layouts.app title="Edit Soal - Mochin-Kuis">
     <div class="max-w-2xl mx-auto">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">Edit Soal</h1>
-        <p class="text-gray-500 mb-6">{{ $quiz->title }}</p>
+        <div class="mb-4 sm:mb-6">
+            <div class="flex items-center gap-2 mb-1">
+                <svg class="w-5 h-5 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                <h1 class="text-lg sm:text-2xl font-bold text-gray-900">Edit Soal</h1>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-500">{{ $quiz->title }}</p>
+        </div>
 
         <form method="POST" action="{{ route('questions.update', [$quiz, $question]) }}"
             x-data="{
@@ -17,19 +24,20 @@
                     }
                 }
             }"
-            class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+            class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 space-y-4 shadow-sm">
             @csrf
             @method('PUT')
 
             <div>
-                <label for="question_text" class="block text-sm font-medium text-gray-700 mb-1">Pertanyaan</label>
-                <textarea name="question_text" id="question_text" rows="3" required>{{ old('question_text', $question->question_text) }}</textarea>
+                <label for="question_text" class="block text-sm font-medium text-gray-700 mb-1.5">Pertanyaan</label>
+                <textarea name="question_text" id="question_text" rows="3" required
+                    class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800">{{ old('question_text', $question->question_text) }}</textarea>
             </div>
 
             <div>
-                <label for="time_limit" class="block text-sm font-medium text-gray-700 mb-1">Batas Waktu (detik)</label>
+                <label for="time_limit" class="block text-sm font-medium text-gray-700 mb-1.5">Batas Waktu (detik)</label>
                 <input type="number" name="time_limit" id="time_limit" value="{{ old('time_limit', $question->time_limit) }}" min="5" max="300" required
-                    class="w-32">
+                    class="w-32 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800">
             </div>
 
             <div>
@@ -40,31 +48,37 @@
                         <div class="flex items-center gap-2">
                             <input type="radio" :value="index" x-model="correctOption"
                                 name="correct_option_radio"
-                                class="text-indigo-600 focus:ring-indigo-500">
+                                class="text-blue-900 focus:ring-blue-800">
+                            <span class="shrink-0 w-6 h-6 rounded flex items-center justify-center text-xs font-semibold bg-gray-100 text-gray-600" x-text="String.fromCharCode(65 + index)"></span>
                             <input type="text" x-model="option.text"
                                 :name="'options[' + index + '][text]'"
                                 placeholder="Teks pilihan..."
                                 required
-                                class="flex-1">
+                                class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
                             <button type="button" @click="removeOption(index)"
                                 x-show="options.length > 2"
-                                class="text-red-400 hover:text-red-600 px-2">
-                                &times;
+                                class="text-red-400 hover:text-red-600 px-2 cursor-pointer">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
                             </button>
                         </div>
                     </template>
                 </div>
                 <button type="button" @click="addOption()" x-show="options.length < 6"
-                    class="mt-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-                    + Tambah Pilihan
+                    class="mt-3 text-sm text-blue-900 hover:text-blue-700 font-semibold cursor-pointer flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Tambah Pilihan
                 </button>
             </div>
 
-            <div class="flex gap-3 pt-2">
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
+            <div class="flex gap-2 sm:gap-3 pt-2">
+                <button type="submit" class="bg-blue-900 text-white px-5 sm:px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-800 transition shadow-sm cursor-pointer text-sm">
                     Simpan Perubahan
                 </button>
-                <a href="{{ route('quizzes.show', $quiz) }}" class="px-6 py-2 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition">
+                <a href="{{ route('quizzes.show', $quiz) }}" class="px-5 sm:px-6 py-2.5 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition text-sm">
                     Batal
                 </a>
             </div>
