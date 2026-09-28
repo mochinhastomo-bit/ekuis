@@ -29,9 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update'])->name('quizzes.update');
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('quizzes.destroy');
 
-    // Quiz Tokens
-    Route::post('/quizzes/{quiz}/tokens', [QuizController::class, 'generateTokens'])->name('quizzes.tokens.generate');
-    Route::delete('/quizzes/{quiz}/tokens', [QuizController::class, 'clearTokens'])->name('quizzes.tokens.clear');
+    // Quiz Tokens (on mahasiswa page)
+    Route::post('/mahasiswa/tokens/{quiz}/generate', [MahasiswaController::class, 'generateTokens'])->name('mahasiswa.tokens.generate');
+    Route::delete('/mahasiswa/tokens/{quiz}/clear', [MahasiswaController::class, 'clearTokens'])->name('mahasiswa.tokens.clear');
 
     // Quiz Sessions
     Route::post('/quizzes/{quiz}/sessions', [QuizController::class, 'startSession'])->name('quizzes.sessions.start');

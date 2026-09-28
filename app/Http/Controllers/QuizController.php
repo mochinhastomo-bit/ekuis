@@ -6,12 +6,9 @@ use App\Models\Kelas;
 use App\Models\Matakuliah;
 use App\Models\Periode;
 use App\Models\Prodi;
-use App\Models\Mahasiswa;
 use App\Models\Quiz;
 use App\Models\QuizSession;
-use App\Models\QuizToken;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class QuizController extends Controller
 {
@@ -39,7 +36,7 @@ class QuizController extends Controller
     public function show(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
-        $quiz->load(['questions.options', 'periode', 'prodi', 'matakuliah', 'kelas', 'tokens.mahasiswa', 'sessions' => fn ($q) => $q->withCount('attempts')->latest()]);
+        $quiz->load(['questions.options', 'periode', 'prodi', 'matakuliah', 'kelas', 'sessions' => fn ($q) => $q->withCount('attempts')->latest()]);
 
         $activeSession = $quiz->sessions->firstWhere('is_active', true);
 
@@ -79,51 +76,6 @@ class QuizController extends Controller
         $quiz->delete();
 
         return redirect()->route('dashboard')->with('success', 'Kuis berhasil dihapus.');
-    }
-
-    public function generateTokens(Request $request, Quiz $quiz)
-    {
-        $this->authorizeQuiz($quiz);
-
-        $request->validate([
-            'prodi_id' => ['nullable', 'exists:prodis,id'],
-        ]);
-
-        $query = Mahasiswa::query();
-        if ($request->prodi_id) {
-            $query->where('prodi_id', $request->prodi_id);
-        }
-        $students = $query->get();
-
-        if ($students->isEmpty()) {
-            return back()->withErrors(['prodi_id' => 'Tidak ada mahasiswa ditemukan.']);
-        }
-
-        $generated = 0;
-        foreach ($students as $student) {
-            $exists = QuizToken::where('quiz_id', $quiz->id)
-                ->where('mahasiswa_id', $student->id)
-                ->exists();
-
-            if (! $exists) {
-                QuizToken::create([
-                    'quiz_id' => $quiz->id,
-                    'mahasiswa_id' => $student->id,
-                    'token' => strtoupper(Str::random(8)),
-                ]);
-                $generated++;
-            }
-        }
-
-        return back()->with('success', "Token berhasil digenerate untuk {$generated} mahasiswa.");
-    }
-
-    public function clearTokens(Quiz $quiz)
-    {
-        $this->authorizeQuiz($quiz);
-        $quiz->tokens()->delete();
-
-        return back()->with('success', 'Semua token berhasil dihapus.');
     }
 
     public function startSession(Request $request, Quiz $quiz)
