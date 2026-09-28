@@ -26,7 +26,7 @@
 
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">
-                    <span x-text="withQuiz ? 'Token Kuis' : 'Password'">Password</span>
+                    <span x-text="withQuiz ? 'Token Mahasiswa' : 'Password'">Password</span>
                 </label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
