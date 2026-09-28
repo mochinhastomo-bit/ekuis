@@ -16,25 +16,27 @@
                 <h1 class="text-lg sm:text-2xl font-bold">Ikuti Kuis</h1>
             </div>
             <p class="text-blue-200 mb-4 sm:mb-6 text-xs sm:text-sm">Masukkan kode kuis dari dosen untuk mulai mengerjakan</p>
-            <form method="POST" action="{{ route('quiz.join') }}" class="flex gap-2 sm:gap-3 max-w-lg">
+            <form method="POST" action="{{ route('quiz.join') }}" class="max-w-lg">
                 @csrf
-                <div class="relative flex-1">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                <div class="flex gap-2 sm:gap-3 mb-2">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="code" value="{{ old('code') }}" placeholder="Kode kuis" required
+                            class="!pl-10 sm:!pl-12 w-full rounded-xl border border-gray-200 shadow-sm bg-white text-gray-900 placeholder-gray-400 py-2.5 sm:py-3 uppercase tracking-widest font-semibold text-sm sm:text-lg"
+                            maxlength="6">
+                    </div>
+                    <button type="submit"
+                        class="bg-white text-blue-900 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-sm cursor-pointer flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                         </svg>
-                    </span>
-                    <input type="text" name="code" placeholder="Masukkan kode kuis" required
-                        class="!pl-10 sm:!pl-12 w-full rounded-xl border border-gray-200 shadow-sm bg-white text-gray-900 placeholder-gray-400 py-2.5 sm:py-3 uppercase tracking-widest font-semibold text-sm sm:text-lg"
-                        maxlength="6">
+                        Gabung
+                    </button>
                 </div>
-                <button type="submit"
-                    class="bg-white text-blue-900 px-4 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold hover:bg-blue-50 transition shadow-sm cursor-pointer flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                    </svg>
-                    Gabung
-                </button>
             </form>
             @error('code')
                 <p class="mt-3 text-sm text-red-300 flex items-center gap-1">

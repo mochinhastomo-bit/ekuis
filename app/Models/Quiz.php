@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
-#[Fillable(['title', 'description', 'is_active'])]
+#[Fillable(['title', 'description', 'is_active', 'periode_id', 'prodi_id', 'matakuliah_id', 'kelas_id'])]
 class Quiz extends Model
 {
     protected function casts(): array
@@ -30,6 +30,26 @@ class Quiz extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function periode(): BelongsTo
+    {
+        return $this->belongsTo(Periode::class);
+    }
+
+    public function prodi(): BelongsTo
+    {
+        return $this->belongsTo(Prodi::class);
+    }
+
+    public function matakuliah(): BelongsTo
+    {
+        return $this->belongsTo(Matakuliah::class);
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class);
+    }
+
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class)->orderBy('order');
@@ -38,5 +58,10 @@ class Quiz extends Model
     public function attempts(): HasMany
     {
         return $this->hasMany(QuizAttempt::class);
+    }
+
+    public function tokens(): HasMany
+    {
+        return $this->hasMany(QuizToken::class);
     }
 }

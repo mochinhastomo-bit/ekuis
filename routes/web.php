@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\QuizPlayController;
@@ -20,8 +22,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->n
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 
-// Dosen - Quiz CRUD
+// Dosen
 Route::middleware(['auth', 'role:dosen'])->group(function () {
+    // Quiz CRUD
     Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
     Route::post('/quizzes', [QuizController::class, 'store'])->name('quizzes.store');
     Route::get('/quizzes/{quiz}', [QuizController::class, 'show'])->name('quizzes.show');
@@ -29,12 +32,24 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update'])->name('quizzes.update');
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('quizzes.destroy');
 
+    // Quiz Tokens
+    Route::post('/quizzes/{quiz}/tokens', [QuizController::class, 'generateTokens'])->name('quizzes.tokens.generate');
+    Route::delete('/quizzes/{quiz}/tokens', [QuizController::class, 'clearTokens'])->name('quizzes.tokens.clear');
+
     // Questions
     Route::get('/quizzes/{quiz}/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::post('/quizzes/{quiz}/questions', [QuestionController::class, 'store'])->name('questions.store');
     Route::get('/quizzes/{quiz}/questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
     Route::put('/quizzes/{quiz}/questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
     Route::delete('/quizzes/{quiz}/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+
+    // Master Data
+    Route::get('/master-data', [MasterDataController::class, 'index'])->name('master-data.index');
+    Route::post('/master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
+    Route::delete('/master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
+
+    // Mahasiswa
+    Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
 });
 
 // Mahasiswa - Quiz Play

@@ -9,6 +9,46 @@
 
         <form method="POST" action="{{ route('quizzes.store') }}" class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 space-y-4 shadow-sm">
             @csrf
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div>
+                    <label for="periode_id" class="block text-sm font-medium text-gray-700 mb-1.5">Periode Akademik</label>
+                    <select name="periode_id" id="periode_id" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
+                        <option value="">-- Pilih Periode --</option>
+                        @foreach($periodes as $p)
+                            <option value="{{ $p->id }}" {{ old('periode_id') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="prodi_id" class="block text-sm font-medium text-gray-700 mb-1.5">Program Studi</label>
+                    <select name="prodi_id" id="prodi_id" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
+                        <option value="">-- Pilih Prodi --</option>
+                        @foreach($prodis as $p)
+                            <option value="{{ $p->id }}" {{ old('prodi_id') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="matakuliah_id" class="block text-sm font-medium text-gray-700 mb-1.5">Mata Kuliah</label>
+                    <select name="matakuliah_id" id="matakuliah_id" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
+                        <option value="">-- Pilih Matakuliah --</option>
+                        @foreach($matakuliahs as $mk)
+                            <option value="{{ $mk->id }}" {{ old('matakuliah_id') == $mk->id ? 'selected' : '' }}>{{ $mk->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1.5">Kelas</label>
+                    <select name="kelas_id" id="kelas_id" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
+                        <option value="">-- Pilih Kelas --</option>
+                        @foreach($kelasList as $k)
+                            <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <div>
                 <label for="title" class="block text-sm font-medium text-gray-700 mb-1.5">Judul Kuis</label>
                 <input type="text" name="title" id="title" value="{{ old('title') }}" required autofocus

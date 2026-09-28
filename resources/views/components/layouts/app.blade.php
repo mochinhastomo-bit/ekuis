@@ -11,13 +11,24 @@
     <nav class="bg-blue-900 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-14 sm:h-16">
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white/90" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M60 15L10 40L60 65L110 40L60 15Z" fill="currentColor"/>
-                        <path d="M25 48V78C25 78 42 95 60 95C78 95 95 78 95 78V48" stroke="currentColor" stroke-width="4" fill="none"/>
-                        <line x1="110" y1="40" x2="110" y2="85" stroke="currentColor" stroke-width="4"/>
-                    </svg>
-                    <a href="/dashboard" class="text-base sm:text-xl font-bold text-white">Mochin-Kuis</a>
+                <div class="flex items-center gap-3 sm:gap-5">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white/90" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M60 15L10 40L60 65L110 40L60 15Z" fill="currentColor"/>
+                            <path d="M25 48V78C25 78 42 95 60 95C78 95 95 78 95 78V48" stroke="currentColor" stroke-width="4" fill="none"/>
+                            <line x1="110" y1="40" x2="110" y2="85" stroke="currentColor" stroke-width="4"/>
+                        </svg>
+                        <a href="/dashboard" class="text-base sm:text-xl font-bold text-white">Mochin-Kuis</a>
+                    </div>
+                    @auth
+                        @if(auth()->user()->isDosen())
+                        <nav class="hidden sm:flex items-center gap-1 text-sm">
+                            <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('dashboard') ? 'bg-white/15 text-white' : '' }}">Kuis</a>
+                            <a href="{{ route('mahasiswa.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('mahasiswa.*') ? 'bg-white/15 text-white' : '' }}">Mahasiswa</a>
+                            <a href="{{ route('master-data.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('master-data.*') ? 'bg-white/15 text-white' : '' }}">Master Data</a>
+                        </nav>
+                        @endif
+                    @endauth
                 </div>
                 @auth
                 <div class="flex items-center gap-2 sm:gap-4">
@@ -41,6 +52,18 @@
             </div>
         </div>
     </nav>
+
+    @auth
+        @if(auth()->user()->isDosen())
+        <nav class="sm:hidden bg-white border-b border-gray-200 shadow-sm">
+            <div class="flex justify-around text-xs font-medium">
+                <a href="{{ route('dashboard') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('dashboard') || request()->routeIs('quizzes.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Kuis</a>
+                <a href="{{ route('mahasiswa.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('mahasiswa.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Mahasiswa</a>
+                <a href="{{ route('master-data.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('master-data.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Master Data</a>
+            </div>
+        </nav>
+        @endif
+    @endauth
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         @if(session('success'))
