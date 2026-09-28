@@ -10,27 +10,29 @@
     </div>
 
     {{-- Filter --}}
-    <form method="GET" class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6 shadow-sm">
+    <form method="GET" class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6 shadow-sm space-y-2">
         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari NIM atau nama..."
-                class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
-            <select name="prodi_id" class="rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+                class="w-full sm:flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+            <select name="prodi_id" class="w-full sm:w-auto rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
                 <option value="">Semua Prodi</option>
                 @foreach($prodis as $p)
                     <option value="{{ $p->id }}" {{ request('prodi_id') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                 @endforeach
             </select>
-            <select name="quiz_id" class="rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
-                <option value="">Pilih Kuis (Token)</option>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <select name="quiz_id" class="w-full sm:flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+                <option value="">Pilih Kuis (untuk lihat Token)</option>
                 @foreach($quizzes as $q)
                     <option value="{{ $q->id }}" {{ request('quiz_id') == $q->id ? 'selected' : '' }}>{{ $q->title }} ({{ $q->code }})</option>
                 @endforeach
             </select>
-            <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-800 transition cursor-pointer text-sm">
+            <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-800 transition cursor-pointer text-sm shrink-0">
                 Filter
             </button>
             @if(request('search') || request('prodi_id') || request('quiz_id'))
-                <a href="{{ route('mahasiswa.index') }}" class="px-4 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition text-sm text-center">
+                <a href="{{ route('mahasiswa.index') }}" class="px-4 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition text-sm text-center shrink-0">
                     Reset
                 </a>
             @endif
