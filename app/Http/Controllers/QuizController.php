@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kelas;
 use App\Models\Matakuliah;
 use App\Models\Periode;
 use App\Models\Prodi;
@@ -25,7 +24,6 @@ class QuizController extends Controller
             'periode_id' => ['nullable', 'exists:periodes,id'],
             'prodi_id' => ['nullable', 'exists:prodis,id'],
             'matakuliah_id' => ['nullable', 'exists:matakuliahs,id'],
-            'kelas_id' => ['nullable', 'exists:kelas,id'],
         ]);
 
         $quiz = $request->user()->quizzes()->create($validated);
@@ -36,7 +34,7 @@ class QuizController extends Controller
     public function show(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
-        $quiz->load(['questions.options', 'periode', 'prodi', 'matakuliah', 'kelas', 'sessions' => fn ($q) => $q->withCount('attempts')->latest()]);
+        $quiz->load(['questions.options', 'periode', 'prodi', 'matakuliah', 'sessions' => fn ($q) => $q->withCount('attempts')->latest()]);
 
         $activeSession = $quiz->sessions->firstWhere('is_active', true);
 
@@ -61,7 +59,6 @@ class QuizController extends Controller
             'periode_id' => ['nullable', 'exists:periodes,id'],
             'prodi_id' => ['nullable', 'exists:prodis,id'],
             'matakuliah_id' => ['nullable', 'exists:matakuliahs,id'],
-            'kelas_id' => ['nullable', 'exists:kelas,id'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active');
@@ -120,7 +117,7 @@ class QuizController extends Controller
         abort_unless($session->quiz_id === $quiz->id, 404);
 
         $session->load(['attempts.mahasiswa']);
-        $quiz->load(['periode', 'prodi', 'matakuliah', 'kelas']);
+        $quiz->load(['periode', 'prodi', 'matakuliah']);
 
         return view('dosen.quizzes.session-results', compact('quiz', 'session'));
     }
@@ -136,7 +133,6 @@ class QuizController extends Controller
             'periodes' => Periode::orderBy('nama')->get(),
             'prodis' => Prodi::orderBy('nama')->get(),
             'matakuliahs' => Matakuliah::orderBy('nama')->get(),
-            'kelasList' => Kelas::orderBy('nama')->get(),
         ];
     }
 }

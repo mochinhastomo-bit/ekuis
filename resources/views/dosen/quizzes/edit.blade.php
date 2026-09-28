@@ -39,15 +39,6 @@
                         @endforeach
                     </select>
                 </div>
-                <div>
-                    <label for="kelas_id" class="block text-sm font-medium text-gray-700 mb-1.5">Kelas</label>
-                    <select name="kelas_id" id="kelas_id" class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
-                        <option value="">-- Pilih Kelas --</option>
-                        @foreach($kelasList as $k)
-                            <option value="{{ $k->id }}" {{ old('kelas_id', $quiz->kelas_id) == $k->id ? 'selected' : '' }}>{{ $k->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
             </div>
 
             <div>

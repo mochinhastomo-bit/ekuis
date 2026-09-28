@@ -16,9 +16,6 @@
                         @if($quiz->matakuliah)
                             <span>MK: <strong class="text-gray-700">{{ $quiz->matakuliah->nama }}</strong></span>
                         @endif
-                        @if($quiz->kelas)
-                            <span>Kelas: <strong class="text-gray-700">{{ $quiz->kelas->nama }}</strong></span>
-                        @endif
                     </div>
                     <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
                         <span>Mulai: <strong class="text-gray-700">{{ $session->started_at?->format('d M Y H:i') }}</strong></span>

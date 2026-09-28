@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use App\Models\Prodi;
-use App\Models\Quiz;
-use App\Models\QuizToken;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class MahasiswaController extends Controller
 {
@@ -19,81 +16,68 @@ class MahasiswaController extends Controller
             $query->where('prodi_id', $request->prodi_id);
         }
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('nim', 'like', "%{$search}%");
-            });
-        }
-
-        $selectedQuiz = null;
-        $tokens = collect();
-
-        if ($request->filled('quiz_id')) {
-            $selectedQuiz = Quiz::where('id', $request->quiz_id)
-                ->where('user_id', auth()->id())
-                ->first();
-
-            if ($selectedQuiz) {
-                $tokens = QuizToken::where('quiz_id', $selectedQuiz->id)
-                    ->pluck('token', 'mahasiswa_id');
-            }
-        }
-
-        $mahasiswas = $query->paginate(50)->withQueryString();
+        $mahasiswas = $query->get();
         $prodis = Prodi::orderBy('nama')->get();
-        $quizzes = auth()->user()->quizzes()->orderBy('title')->get();
 
-        return view('dosen.mahasiswa.index', compact('mahasiswas', 'prodis', 'quizzes', 'selectedQuiz', 'tokens'));
+        return view('dosen.mahasiswa.index', compact('mahasiswas', 'prodis'));
     }
 
-    public function generateTokens(Request $request, Quiz $quiz)
+    public function store(Request $request)
     {
-        abort_unless($quiz->user_id === auth()->id(), 403);
-
-        $request->validate([
+        $validated = $request->validate([
+            'nim' => ['required', 'string', 'max:20', 'unique:mahasiswas,nim'],
+            'name' => ['required', 'string', 'max:255'],
             'prodi_id' => ['nullable', 'exists:prodis,id'],
         ]);
 
-        $query = Mahasiswa::query();
-        if ($request->prodi_id) {
-            $query->where('prodi_id', $request->prodi_id);
-        }
-        $students = $query->get();
+        $mhs = Mahasiswa::create($validated);
+        $mhs->load('prodi');
 
-        if ($students->isEmpty()) {
-            return back()->withErrors(['prodi_id' => 'Tidak ada mahasiswa ditemukan.']);
-        }
-
-        $generated = 0;
-        foreach ($students as $student) {
-            $exists = QuizToken::where('quiz_id', $quiz->id)
-                ->where('mahasiswa_id', $student->id)
-                ->exists();
-
-            if (! $exists) {
-                QuizToken::create([
-                    'quiz_id' => $quiz->id,
-                    'mahasiswa_id' => $student->id,
-                    'token' => strtoupper(Str::random(8)),
-                ]);
-                $generated++;
-            }
-        }
-
-        return redirect()->route('mahasiswa.index', array_filter([
-            'quiz_id' => $quiz->id,
-            'prodi_id' => $request->prodi_id,
-        ]))->with('success', "Token berhasil digenerate untuk {$generated} mahasiswa.");
+        return response()->json([
+            'message' => "Mahasiswa {$mhs->name} berhasil ditambahkan.",
+            'mahasiswa' => [
+                'id' => $mhs->id,
+                'nim' => $mhs->nim,
+                'name' => $mhs->name,
+                'token' => $mhs->token,
+                'prodi' => $mhs->prodi?->nama ?? '-',
+            ],
+        ]);
     }
 
-    public function clearTokens(Request $request, Quiz $quiz)
+    public function generateAllTokens()
     {
-        abort_unless($quiz->user_id === auth()->id(), 403);
-        $quiz->tokens()->delete();
+        $count = Mahasiswa::whereNull('token')->count();
 
-        return redirect()->route('mahasiswa.index', ['quiz_id' => $quiz->id])
-            ->with('success', 'Semua token berhasil dihapus.');
+        if ($count === 0) {
+            return response()->json([
+                'message' => 'Semua mahasiswa sudah memiliki token.',
+                'tokens' => [],
+            ]);
+        }
+
+        $tokens = [];
+        Mahasiswa::whereNull('token')->each(function ($mhs) use (&$tokens) {
+            $token = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+            $mhs->update(['token' => $token]);
+            $tokens[$mhs->id] = $token;
+        });
+
+        return response()->json([
+            'message' => "Token berhasil digenerate untuk {$count} mahasiswa.",
+            'tokens' => $tokens,
+        ]);
+    }
+
+    public function regenerateToken(Mahasiswa $mahasiswa)
+    {
+        $token = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+        $mahasiswa->update(['token' => $token]);
+
+        return response()->json([
+            'message' => "Token {$mahasiswa->name} berhasil diperbarui.",
+            'token' => $token,
+            'mahasiswa_id' => $mahasiswa->id,
+        ]);
     }
 }

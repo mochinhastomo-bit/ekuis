@@ -11,7 +11,6 @@
             ['periodes', 'Periode Akademik', $periodes, 'Contoh: 2026-2027 Genap'],
             ['prodis', 'Program Studi', $prodis, 'Contoh: Teknik Informatika'],
             ['matakuliahs', 'Mata Kuliah', $matakuliahs, 'Contoh: Pemrograman Web'],
-            ['kelas', 'Kelas', $kelas, 'Contoh: Malam'],
         ] as [$type, $label, $items, $placeholder])
         <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm">
             <h2 class="font-semibold text-gray-900 mb-3 flex items-center gap-2">

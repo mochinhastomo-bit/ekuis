@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Mahasiswa;
 use App\Models\Quiz;
-use App\Models\QuizToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,12 +65,8 @@ class AuthController extends Controller
             return back()->withErrors(['nim' => 'NIM tidak ditemukan.'])->onlyInput('nim', 'kode_kuis');
         }
 
-        $token = QuizToken::where('quiz_id', $quiz->id)
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->first();
-
-        if (! $token || strtoupper($request->password) !== strtoupper($token->token)) {
-            return back()->withErrors(['password' => 'Token kuis salah.'])->onlyInput('nim', 'kode_kuis');
+        if (! $mahasiswa->token || $request->password !== $mahasiswa->token) {
+            return back()->withErrors(['password' => 'Token salah.'])->onlyInput('nim', 'kode_kuis');
         }
 
         $request->session()->regenerate();

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kelas;
 use App\Models\Matakuliah;
 use App\Models\Periode;
 use App\Models\Prodi;
@@ -14,7 +13,6 @@ class MasterDataController extends Controller
         'periodes' => [Periode::class, 'Periode Akademik'],
         'prodis' => [Prodi::class, 'Program Studi'],
         'matakuliahs' => [Matakuliah::class, 'Mata Kuliah'],
-        'kelas' => [Kelas::class, 'Kelas'],
     ];
 
     public function index()
@@ -28,7 +26,6 @@ class MasterDataController extends Controller
             'periodes' => $data['periodes'],
             'prodis' => $data['prodis'],
             'matakuliahs' => $data['matakuliahs'],
-            'kelas' => $data['kelas'],
         ]);
     }
 

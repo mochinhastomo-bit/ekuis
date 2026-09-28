@@ -29,9 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update'])->name('quizzes.update');
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('quizzes.destroy');
 
-    // Quiz Tokens (on mahasiswa page)
-    Route::post('/mahasiswa/tokens/{quiz}/generate', [MahasiswaController::class, 'generateTokens'])->name('mahasiswa.tokens.generate');
-    Route::delete('/mahasiswa/tokens/{quiz}/clear', [MahasiswaController::class, 'clearTokens'])->name('mahasiswa.tokens.clear');
+    // Mahasiswa Tokens
+    Route::post('/mahasiswa/tokens/generate-all', [MahasiswaController::class, 'generateAllTokens'])->name('mahasiswa.tokens.generate-all');
+    Route::post('/mahasiswa/{mahasiswa}/regenerate-token', [MahasiswaController::class, 'regenerateToken'])->name('mahasiswa.tokens.regenerate');
 
     // Quiz Sessions
     Route::post('/quizzes/{quiz}/sessions', [QuizController::class, 'startSession'])->name('quizzes.sessions.start');
@@ -50,8 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
     Route::delete('/master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
 
-    // Mahasiswa List
+    // Mahasiswa
     Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
+    Route::post('/mahasiswa', [MahasiswaController::class, 'store'])->name('mahasiswa.store');
 });
 
 // Mahasiswa

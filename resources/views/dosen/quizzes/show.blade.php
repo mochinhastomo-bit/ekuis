@@ -20,7 +20,7 @@
                         <span class="text-xs text-gray-500">Kode: <span class="font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded">{{ $quiz->code }}</span></span>
                     </div>
 
-                    @if($quiz->periode || $quiz->prodi || $quiz->matakuliah || $quiz->kelas)
+                    @if($quiz->periode || $quiz->prodi || $quiz->matakuliah)
                     <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
                         @if($quiz->periode)
                             <span>Periode: <strong class="text-gray-700">{{ $quiz->periode->nama }}</strong></span>
@@ -30,9 +30,6 @@
                         @endif
                         @if($quiz->matakuliah)
                             <span>MK: <strong class="text-gray-700">{{ $quiz->matakuliah->nama }}</strong></span>
-                        @endif
-                        @if($quiz->kelas)
-                            <span>Kelas: <strong class="text-gray-700">{{ $quiz->kelas->nama }}</strong></span>
                         @endif
                     </div>
                     @endif
