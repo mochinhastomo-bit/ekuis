@@ -64,4 +64,14 @@ class Quiz extends Model
     {
         return $this->hasMany(QuizToken::class);
     }
+
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(QuizSession::class);
+    }
+
+    public function activeSession(): ?QuizSession
+    {
+        return $this->sessions()->where('is_active', true)->first();
+    }
 }

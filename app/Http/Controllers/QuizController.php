@@ -8,6 +8,7 @@ use App\Models\Periode;
 use App\Models\Prodi;
 use App\Models\Mahasiswa;
 use App\Models\Quiz;
+use App\Models\QuizSession;
 use App\Models\QuizToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -38,9 +39,11 @@ class QuizController extends Controller
     public function show(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
-        $quiz->load(['questions.options', 'attempts.mahasiswa', 'periode', 'prodi', 'matakuliah', 'kelas', 'tokens.mahasiswa']);
+        $quiz->load(['questions.options', 'periode', 'prodi', 'matakuliah', 'kelas', 'tokens.mahasiswa', 'sessions' => fn ($q) => $q->withCount('attempts')->latest()]);
 
-        return view('dosen.quizzes.show', compact('quiz'));
+        $activeSession = $quiz->sessions->firstWhere('is_active', true);
+
+        return view('dosen.quizzes.show', compact('quiz', 'activeSession'));
     }
 
     public function edit(Quiz $quiz)
@@ -121,6 +124,53 @@ class QuizController extends Controller
         $quiz->tokens()->delete();
 
         return back()->with('success', 'Semua token berhasil dihapus.');
+    }
+
+    public function startSession(Request $request, Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
+        $quiz->sessions()->where('is_active', true)->update([
+            'is_active' => false,
+            'ended_at' => now(),
+        ]);
+
+        QuizSession::create([
+            'quiz_id' => $quiz->id,
+            'name' => $request->name,
+            'is_active' => true,
+            'started_at' => now(),
+        ]);
+
+        return back()->with('success', "Sesi \"{$request->name}\" berhasil dimulai.");
+    }
+
+    public function endSession(Quiz $quiz, QuizSession $session)
+    {
+        $this->authorizeQuiz($quiz);
+        abort_unless($session->quiz_id === $quiz->id, 404);
+
+        $session->update([
+            'is_active' => false,
+            'ended_at' => now(),
+        ]);
+
+        return back()->with('success', "Sesi \"{$session->name}\" berhasil diakhiri.");
+    }
+
+    public function sessionResults(Quiz $quiz, QuizSession $session)
+    {
+        $this->authorizeQuiz($quiz);
+        abort_unless($session->quiz_id === $quiz->id, 404);
+
+        $session->load(['attempts.mahasiswa']);
+        $quiz->load(['periode', 'prodi', 'matakuliah', 'kelas']);
+
+        return view('dosen.quizzes.session-results', compact('quiz', 'session'));
     }
 
     private function authorizeQuiz(Quiz $quiz): void

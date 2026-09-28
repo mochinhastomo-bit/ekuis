@@ -26,18 +26,26 @@ class QuizPlayController extends Controller
             return back()->withErrors(['code' => 'Kuis ini belum diaktifkan oleh dosen.']);
         }
 
+        $activeSession = $quiz->activeSession();
+        if (! $activeSession) {
+            return back()->withErrors(['code' => 'Belum ada sesi aktif untuk kuis ini.']);
+        }
+
         if ($quiz->questions()->count() === 0) {
             return back()->withErrors(['code' => 'Kuis ini belum memiliki soal.']);
         }
 
         $mahasiswa = $this->mahasiswa();
         $existing = QuizAttempt::where('quiz_id', $quiz->id)
+            ->where('quiz_session_id', $activeSession->id)
             ->where('mahasiswa_id', $mahasiswa->id)
             ->first();
 
         if ($existing && $existing->completed_at) {
-            return back()->withErrors(['code' => 'Anda sudah mengerjakan kuis ini.']);
+            return back()->withErrors(['code' => 'Anda sudah mengerjakan kuis ini di sesi ini.']);
         }
+
+        session(['quiz_session_id' => $activeSession->id]);
 
         return redirect()->route('quiz.play', $quiz);
     }
@@ -47,9 +55,19 @@ class QuizPlayController extends Controller
         abort_unless($quiz->is_active, 404);
 
         $mahasiswa = $this->mahasiswa();
+        $sessionId = session('quiz_session_id');
+
+        if (! $sessionId) {
+            $activeSession = $quiz->activeSession();
+            if (! $activeSession) {
+                return redirect()->route('mahasiswa.dashboard')->with('error', 'Tidak ada sesi aktif untuk kuis ini.');
+            }
+            $sessionId = $activeSession->id;
+            session(['quiz_session_id' => $sessionId]);
+        }
 
         $attempt = QuizAttempt::firstOrCreate(
-            ['quiz_id' => $quiz->id, 'mahasiswa_id' => $mahasiswa->id],
+            ['quiz_id' => $quiz->id, 'quiz_session_id' => $sessionId, 'mahasiswa_id' => $mahasiswa->id],
             [
                 'total_questions' => $quiz->questions()->count(),
                 'question_order' => $quiz->questions()->pluck('id')->shuffle()->values()->toArray(),
@@ -136,7 +154,7 @@ class QuizPlayController extends Controller
             403
         );
 
-        $attempt->load(['quiz', 'answers.question', 'answers.option']);
+        $attempt->load(['quiz', 'session', 'answers.question', 'answers.option']);
 
         return view('mahasiswa.result', compact('attempt'));
     }
@@ -144,7 +162,7 @@ class QuizPlayController extends Controller
     public function dashboard()
     {
         $mahasiswa = $this->mahasiswa();
-        $attempts = $mahasiswa->quizAttempts()->with('quiz')->latest()->get();
+        $attempts = $mahasiswa->quizAttempts()->with(['quiz', 'session'])->latest()->get();
 
         return view('mahasiswa.dashboard', compact('attempts', 'mahasiswa'));
     }

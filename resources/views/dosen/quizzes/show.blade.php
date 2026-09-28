@@ -13,7 +13,6 @@
                     </div>
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">{{ $quiz->description }}</p>
 
-                    {{-- Info badges --}}
                     <div class="flex flex-wrap items-center gap-2 mt-3">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium {{ $quiz->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600' }}">
                             {{ $quiz->is_active ? 'Aktif' : 'Nonaktif' }}
@@ -21,7 +20,6 @@
                         <span class="text-xs text-gray-500">Kode: <span class="font-mono font-bold text-blue-900 bg-blue-50 px-2 py-0.5 rounded">{{ $quiz->code }}</span></span>
                     </div>
 
-                    {{-- Master data info --}}
                     @if($quiz->periode || $quiz->prodi || $quiz->matakuliah || $quiz->kelas)
                     <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-gray-500">
                         @if($quiz->periode)
@@ -56,6 +54,73 @@
             </div>
         </div>
 
+        {{-- Sesi Kuis --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 mb-4 sm:mb-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <h2 class="font-bold text-gray-900 text-sm sm:text-base">Sesi Kuis</h2>
+                @if($activeSession)
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs font-medium bg-green-100 text-green-800 animate-pulse">Sesi Aktif</span>
+                @endif
+            </div>
+
+            @if($activeSession)
+                <div class="bg-green-50 border border-green-200 rounded-xl p-3 sm:p-4 mb-3">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-semibold text-green-900 text-sm">{{ $activeSession->name }}</p>
+                            <p class="text-xs text-green-700 mt-0.5">Dimulai: {{ $activeSession->started_at->format('d M Y H:i') }} &middot; {{ $activeSession->attempts_count }} peserta</p>
+                        </div>
+                        <form method="POST" action="{{ route('quizzes.sessions.end', [$quiz, $activeSession]) }}"
+                            onsubmit="return confirm('Akhiri sesi ini? Mahasiswa tidak bisa lagi mengerjakan kuis di sesi ini.')">
+                            @csrf
+                            <button type="submit" class="text-xs font-semibold text-red-600 hover:text-red-800 bg-white border border-red-200 px-3 py-1.5 rounded-lg cursor-pointer">Akhiri Sesi</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('quizzes.sessions.start', $quiz) }}" class="flex flex-col sm:flex-row gap-2">
+                @csrf
+                <input type="text" name="name" placeholder="Nama sesi (misal: Sesi 1 - Pagi)" required
+                    class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+                <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-800 transition cursor-pointer flex items-center justify-center gap-2 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Mulai Sesi Baru
+                </button>
+            </form>
+            @error('name')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+            @enderror
+
+            {{-- Daftar sesi sebelumnya --}}
+            @if($quiz->sessions->where('is_active', false)->isNotEmpty())
+                <div class="mt-4">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Riwayat Sesi</h3>
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                        @foreach($quiz->sessions->where('is_active', false) as $session)
+                            <div class="flex items-center justify-between bg-gray-50 rounded-xl px-3 py-2">
+                                <div>
+                                    <p class="font-medium text-gray-900 text-sm">{{ $session->name }}</p>
+                                    <p class="text-xs text-gray-500">
+                                        {{ $session->started_at?->format('d M Y H:i') }}
+                                        @if($session->ended_at) &mdash; {{ $session->ended_at->format('H:i') }} @endif
+                                        &middot; {{ $session->attempts_count }} peserta
+                                    </p>
+                                </div>
+                                <a href="{{ route('quizzes.sessions.results', [$quiz, $session]) }}" class="text-xs text-blue-900 font-semibold hover:text-blue-700">Lihat Nilai</a>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
+
         {{-- Token Mahasiswa --}}
         <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 mb-4 sm:mb-6 shadow-sm">
             <div class="flex items-center justify-between mb-3">
@@ -67,14 +132,14 @@
                 </div>
                 @if($quiz->tokens->isNotEmpty())
                     <form method="POST" action="{{ route('quizzes.tokens.clear', $quiz) }}"
-                        onsubmit="return confirm('Hapus semua token? Token yang belum digunakan tidak bisa dipakai lagi.')">
+                        onsubmit="return confirm('Hapus semua token?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="text-xs text-red-600 hover:text-red-800 font-medium cursor-pointer bg-red-50 px-3 py-1.5 rounded-lg">Hapus Semua</button>
                     </form>
                 @endif
             </div>
-            <p class="text-xs text-gray-500 mb-3">Generate token unik per mahasiswa. Mahasiswa login dengan NIM + Token + Kode Kuis untuk langsung masuk ke kuis.</p>
+            <p class="text-xs text-gray-500 mb-3">Generate token dari master mahasiswa. Token bisa dipakai berulang di setiap sesi kuis.</p>
 
             @error('prodi_id')
                 <p class="mb-3 text-sm text-red-600">{{ $message }}</p>
@@ -98,52 +163,46 @@
             </form>
 
             @if($quiz->tokens->isNotEmpty())
-                {{-- Mobile: Card layout --}}
-                <div class="sm:hidden space-y-2 max-h-64 overflow-y-auto">
-                    @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
-                        <div class="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
-                            <div class="min-w-0 flex-1">
-                                <p class="font-medium text-gray-900 text-sm truncate">{{ $token->mahasiswa->name }}</p>
-                                <p class="text-xs text-gray-500">{{ $token->mahasiswa->nim }}</p>
-                            </div>
-                            <div class="text-right shrink-0 ml-3">
-                                <span class="font-mono text-sm font-bold {{ $token->used_at ? 'text-gray-400 line-through' : 'text-blue-900' }}">{{ $token->token }}</span>
-                                @if($token->used_at)
-                                    <p class="text-xs text-green-600">Terpakai</p>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+                {{-- Search token --}}
+                <div class="mb-3" x-data="{ search: '' }">
+                    <input type="text" x-model="search" placeholder="Cari nama atau NIM..."
+                        class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
 
-                {{-- Desktop: Table layout --}}
-                <div class="hidden sm:block overflow-x-auto rounded-xl border border-gray-200 max-h-80 overflow-y-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
-                            <tr>
-                                <th class="text-left px-4 py-2 font-semibold text-gray-700">Nama</th>
-                                <th class="text-left px-4 py-2 font-semibold text-gray-700">NIM</th>
-                                <th class="text-center px-4 py-2 font-semibold text-gray-700">Token</th>
-                                <th class="text-center px-4 py-2 font-semibold text-gray-700">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
+                    {{-- Mobile: Card layout --}}
+                    <div class="sm:hidden space-y-2 max-h-64 overflow-y-auto mt-2">
+                        @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
+                            <div class="bg-gray-50 rounded-xl p-3 flex items-center justify-between"
+                                x-show="!search || '{{ strtolower($token->mahasiswa->name . ' ' . $token->mahasiswa->nim) }}'.includes(search.toLowerCase())">
+                                <div class="min-w-0 flex-1">
+                                    <p class="font-medium text-gray-900 text-sm truncate">{{ $token->mahasiswa->name }}</p>
+                                    <p class="text-xs text-gray-500">{{ $token->mahasiswa->nim }}</p>
+                                </div>
+                                <span class="font-mono text-sm font-bold text-blue-900 shrink-0 ml-3">{{ $token->token }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Desktop: Table layout --}}
+                    <div class="hidden sm:block overflow-x-auto rounded-xl border border-gray-200 max-h-80 overflow-y-auto mt-2">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200 sticky top-0">
                                 <tr>
-                                    <td class="px-4 py-2 text-gray-900">{{ $token->mahasiswa->name }}</td>
-                                    <td class="px-4 py-2 text-gray-500">{{ $token->mahasiswa->nim }}</td>
-                                    <td class="px-4 py-2 text-center font-mono font-bold {{ $token->used_at ? 'text-gray-400 line-through' : 'text-blue-900' }}">{{ $token->token }}</td>
-                                    <td class="px-4 py-2 text-center">
-                                        @if($token->used_at)
-                                            <span class="text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded-lg">Terpakai</span>
-                                        @else
-                                            <span class="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded-lg">Belum</span>
-                                        @endif
-                                    </td>
+                                    <th class="text-left px-4 py-2 font-semibold text-gray-700">Nama</th>
+                                    <th class="text-left px-4 py-2 font-semibold text-gray-700">NIM</th>
+                                    <th class="text-center px-4 py-2 font-semibold text-gray-700">Token</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
+                                    <tr x-show="!search || '{{ strtolower($token->mahasiswa->name . ' ' . $token->mahasiswa->nim) }}'.includes(search.toLowerCase())">
+                                        <td class="px-4 py-2 text-gray-900">{{ $token->mahasiswa->name }}</td>
+                                        <td class="px-4 py-2 text-gray-500">{{ $token->mahasiswa->nim }}</td>
+                                        <td class="px-4 py-2 text-center font-mono font-bold text-blue-900">{{ $token->token }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             @endif
         </div>
@@ -206,76 +265,6 @@
                             </div>
                         </div>
                     @endforeach
-                </div>
-            @endif
-        </div>
-
-        {{-- Hasil Peserta --}}
-        <div class="mb-4 sm:mb-6">
-            <div class="flex items-center gap-2 mb-3 sm:mb-4">
-                <svg class="w-5 h-5 text-blue-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                <h2 class="text-base sm:text-lg font-bold text-gray-900">Hasil Peserta ({{ $quiz->attempts->count() }})</h2>
-            </div>
-            @if($quiz->attempts->isEmpty())
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 text-center shadow-sm">
-                    <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <p class="text-gray-500 font-medium">Belum ada peserta</p>
-                    <p class="text-gray-400 text-sm mt-1">Bagikan kode kuis kepada mahasiswa</p>
-                </div>
-            @else
-                {{-- Mobile: Card layout --}}
-                <div class="sm:hidden space-y-2">
-                    @foreach($quiz->attempts->sortByDesc('score') as $attempt)
-                        <a href="{{ route('quiz.result', $attempt) }}" class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center justify-between gap-3 block">
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 text-sm truncate">{{ $attempt->mahasiswa->name }}</p>
-                                <p class="text-xs text-gray-400">{{ $attempt->mahasiswa->nim ?? '-' }} &middot; {{ $attempt->completed_at?->format('d M Y') ?? 'Belum selesai' }}</p>
-                            </div>
-                            <div class="text-right shrink-0">
-                                <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
-                                <p class="text-xs text-gray-400">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-
-                {{-- Desktop: Table layout --}}
-                <div class="hidden sm:block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 border-b border-gray-200">
-                            <tr>
-                                <th class="text-left px-4 py-3 font-semibold text-gray-700">Nama</th>
-                                <th class="text-left px-4 py-3 font-semibold text-gray-700">NIM</th>
-                                <th class="text-center px-4 py-3 font-semibold text-gray-700">Skor</th>
-                                <th class="text-center px-4 py-3 font-semibold text-gray-700">Waktu Selesai</th>
-                                <th class="text-center px-4 py-3 font-semibold text-gray-700"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($quiz->attempts->sortByDesc('score') as $attempt)
-                                <tr class="hover:bg-gray-50 transition">
-                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $attempt->mahasiswa->name }}</td>
-                                    <td class="px-4 py-3 text-gray-500">{{ $attempt->mahasiswa->nim ?? '-' }}</td>
-                                    <td class="px-4 py-3 text-center">
-                                        <span class="font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">
-                                            {{ $attempt->score }}/{{ $attempt->total_questions }}
-                                            ({{ $attempt->scorePercentage() }}%)
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-3 text-center text-gray-500">
-                                        {{ $attempt->completed_at?->format('d M Y H:i') ?? '-' }}
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <a href="{{ route('quiz.result', $attempt) }}" class="text-blue-900 hover:text-blue-700 text-xs font-semibold">Detail</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             @endif
         </div>

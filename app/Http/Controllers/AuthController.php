@@ -56,6 +56,11 @@ class AuthController extends Controller
             return back()->withErrors(['kode_kuis' => 'Kuis ini belum diaktifkan oleh dosen.'])->onlyInput('nim', 'kode_kuis');
         }
 
+        $activeSession = $quiz->activeSession();
+        if (! $activeSession) {
+            return back()->withErrors(['kode_kuis' => 'Belum ada sesi aktif untuk kuis ini.'])->onlyInput('nim', 'kode_kuis');
+        }
+
         $mahasiswa = Mahasiswa::where('nim', $request->nim)->first();
         if (! $mahasiswa) {
             return back()->withErrors(['nim' => 'NIM tidak ditemukan.'])->onlyInput('nim', 'kode_kuis');
@@ -63,16 +68,17 @@ class AuthController extends Controller
 
         $token = QuizToken::where('quiz_id', $quiz->id)
             ->where('mahasiswa_id', $mahasiswa->id)
-            ->whereNull('used_at')
             ->first();
 
         if (! $token || strtoupper($request->password) !== strtoupper($token->token)) {
-            return back()->withErrors(['password' => 'Token kuis salah atau sudah digunakan.'])->onlyInput('nim', 'kode_kuis');
+            return back()->withErrors(['password' => 'Token kuis salah.'])->onlyInput('nim', 'kode_kuis');
         }
 
         $request->session()->regenerate();
-        session(['mahasiswa_id' => $mahasiswa->id]);
-        $token->update(['used_at' => now()]);
+        session([
+            'mahasiswa_id' => $mahasiswa->id,
+            'quiz_session_id' => $activeSession->id,
+        ]);
 
         return redirect()->route('quiz.play', $quiz);
     }
@@ -80,7 +86,7 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        session()->forget('mahasiswa_id');
+        session()->forget(['mahasiswa_id', 'quiz_session_id']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

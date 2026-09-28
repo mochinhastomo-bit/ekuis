@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['quiz_id', 'mahasiswa_id', 'score', 'total_questions', 'question_order', 'started_at', 'completed_at'])]
+#[Fillable(['quiz_id', 'quiz_session_id', 'mahasiswa_id', 'score', 'total_questions', 'question_order', 'started_at', 'completed_at'])]
 class QuizAttempt extends Model
 {
     protected function casts(): array
@@ -22,6 +22,11 @@ class QuizAttempt extends Model
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class);
+    }
+
+    public function session(): BelongsTo
+    {
+        return $this->belongsTo(QuizSession::class, 'quiz_session_id');
     }
 
     public function mahasiswa(): BelongsTo
