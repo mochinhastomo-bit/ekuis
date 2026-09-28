@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttemptAnswer;
+use App\Models\Mahasiswa;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use Illuminate\Http\Request;
@@ -29,8 +30,9 @@ class QuizPlayController extends Controller
             return back()->withErrors(['code' => 'Kuis ini belum memiliki soal.']);
         }
 
+        $mahasiswa = $this->mahasiswa();
         $existing = QuizAttempt::where('quiz_id', $quiz->id)
-            ->where('user_id', $request->user()->id)
+            ->where('mahasiswa_id', $mahasiswa->id)
             ->first();
 
         if ($existing && $existing->completed_at) {
@@ -44,10 +46,10 @@ class QuizPlayController extends Controller
     {
         abort_unless($quiz->is_active, 404);
 
-        $user = $request->user();
+        $mahasiswa = $this->mahasiswa();
 
         $attempt = QuizAttempt::firstOrCreate(
-            ['quiz_id' => $quiz->id, 'user_id' => $user->id],
+            ['quiz_id' => $quiz->id, 'mahasiswa_id' => $mahasiswa->id],
             [
                 'total_questions' => $quiz->questions()->count(),
                 'question_order' => $quiz->questions()->pluck('id')->shuffle()->values()->toArray(),
@@ -79,7 +81,8 @@ class QuizPlayController extends Controller
 
     public function answer(Request $request, Quiz $quiz, QuizAttempt $attempt)
     {
-        abort_unless($attempt->user_id === $request->user()->id, 403);
+        $mahasiswa = $this->mahasiswa();
+        abort_unless($attempt->mahasiswa_id === $mahasiswa->id, 403);
         abort_if($attempt->completed_at, 400);
 
         $validated = $request->validate([
@@ -124,14 +127,31 @@ class QuizPlayController extends Controller
 
     public function result(Request $request, QuizAttempt $attempt)
     {
+        $mahasiswaId = session('mahasiswa_id');
+        $dosenId = auth()->id();
+
         abort_unless(
-            $attempt->user_id === $request->user()->id || $attempt->quiz->user_id === $request->user()->id,
+            ($mahasiswaId && $attempt->mahasiswa_id === $mahasiswaId) ||
+            ($dosenId && $attempt->quiz->user_id === $dosenId),
             403
         );
 
         $attempt->load(['quiz', 'answers.question', 'answers.option']);
 
         return view('mahasiswa.result', compact('attempt'));
+    }
+
+    public function dashboard()
+    {
+        $mahasiswa = $this->mahasiswa();
+        $attempts = $mahasiswa->quizAttempts()->with('quiz')->latest()->get();
+
+        return view('mahasiswa.dashboard', compact('attempts', 'mahasiswa'));
+    }
+
+    private function mahasiswa(): Mahasiswa
+    {
+        return Mahasiswa::findOrFail(session('mahasiswa_id'));
     }
 
     private function completeAttempt(QuizAttempt $attempt)

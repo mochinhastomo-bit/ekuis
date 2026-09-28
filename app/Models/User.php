@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'nim', 'prodi', 'role', 'password'])]
+#[Fillable(['name', 'email', 'nim', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -24,23 +24,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function isDosen(): bool
-    {
-        return $this->role === 'dosen';
-    }
-
-    public function isMahasiswa(): bool
-    {
-        return $this->role === 'mahasiswa';
-    }
-
     public function quizzes(): HasMany
     {
         return $this->hasMany(Quiz::class);
-    }
-
-    public function quizAttempts(): HasMany
-    {
-        return $this->hasMany(QuizAttempt::class);
     }
 }

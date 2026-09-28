@@ -8,6 +8,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-slate-100 min-h-screen">
+    @php
+        $mahasiswa = session('mahasiswa_id') ? \App\Models\Mahasiswa::find(session('mahasiswa_id')) : null;
+        $isDosen = auth()->check();
+    @endphp
+
     <nav class="bg-blue-900 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-14 sm:h-16">
@@ -18,26 +23,29 @@
                             <path d="M25 48V78C25 78 42 95 60 95C78 95 95 78 95 78V48" stroke="currentColor" stroke-width="4" fill="none"/>
                             <line x1="110" y1="40" x2="110" y2="85" stroke="currentColor" stroke-width="4"/>
                         </svg>
-                        <a href="/dashboard" class="text-base sm:text-xl font-bold text-white">Mochin-Kuis</a>
+                        <a href="{{ $isDosen ? route('dashboard') : ($mahasiswa ? route('mahasiswa.dashboard') : '/') }}" class="text-base sm:text-xl font-bold text-white">Mochin-Kuis</a>
                     </div>
-                    @auth
-                        @if(auth()->user()->isDosen())
-                        <nav class="hidden sm:flex items-center gap-1 text-sm">
-                            <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('dashboard') ? 'bg-white/15 text-white' : '' }}">Kuis</a>
-                            <a href="{{ route('mahasiswa.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('mahasiswa.*') ? 'bg-white/15 text-white' : '' }}">Mahasiswa</a>
-                            <a href="{{ route('master-data.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('master-data.*') ? 'bg-white/15 text-white' : '' }}">Master Data</a>
-                        </nav>
-                        @endif
-                    @endauth
+                    @if($isDosen)
+                    <nav class="hidden sm:flex items-center gap-1 text-sm">
+                        <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('dashboard') ? 'bg-white/15 text-white' : '' }}">Kuis</a>
+                        <a href="{{ route('mahasiswa.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('mahasiswa.*') ? 'bg-white/15 text-white' : '' }}">Mahasiswa</a>
+                        <a href="{{ route('master-data.index') }}" class="px-3 py-1.5 rounded-lg text-blue-200 hover:text-white hover:bg-white/10 transition {{ request()->routeIs('master-data.*') ? 'bg-white/15 text-white' : '' }}">Master Data</a>
+                    </nav>
+                    @endif
                 </div>
-                @auth
                 <div class="flex items-center gap-2 sm:gap-4">
-                    <span class="text-xs sm:text-sm text-blue-200 hidden sm:inline">
-                        {{ auth()->user()->name }}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/15 text-white ml-1">
-                            {{ ucfirst(auth()->user()->role) }}
+                    @if($isDosen)
+                        <span class="text-xs sm:text-sm text-blue-200 hidden sm:inline">
+                            {{ auth()->user()->name }}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/15 text-white ml-1">Dosen</span>
                         </span>
-                    </span>
+                    @elseif($mahasiswa)
+                        <span class="text-xs sm:text-sm text-blue-200 hidden sm:inline">
+                            {{ $mahasiswa->name }}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/15 text-white ml-1">Mahasiswa</span>
+                        </span>
+                    @endif
+                    @if($isDosen || $mahasiswa)
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="text-xs sm:text-sm text-blue-300 hover:text-white transition cursor-pointer flex items-center gap-1">
@@ -47,23 +55,21 @@
                             Keluar
                         </button>
                     </form>
+                    @endif
                 </div>
-                @endauth
             </div>
         </div>
     </nav>
 
-    @auth
-        @if(auth()->user()->isDosen())
-        <nav class="sm:hidden bg-white border-b border-gray-200 shadow-sm">
-            <div class="flex justify-around text-xs font-medium">
-                <a href="{{ route('dashboard') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('dashboard') || request()->routeIs('quizzes.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Kuis</a>
-                <a href="{{ route('mahasiswa.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('mahasiswa.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Mahasiswa</a>
-                <a href="{{ route('master-data.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('master-data.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Master Data</a>
-            </div>
-        </nav>
-        @endif
-    @endauth
+    @if($isDosen)
+    <nav class="sm:hidden bg-white border-b border-gray-200 shadow-sm">
+        <div class="flex justify-around text-xs font-medium">
+            <a href="{{ route('dashboard') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('dashboard') || request()->routeIs('quizzes.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Kuis</a>
+            <a href="{{ route('mahasiswa.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('mahasiswa.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Mahasiswa</a>
+            <a href="{{ route('master-data.index') }}" class="flex-1 text-center py-2.5 {{ request()->routeIs('master-data.*') ? 'text-blue-900 border-b-2 border-blue-900' : 'text-gray-500' }}">Master Data</a>
+        </div>
+    </nav>
+    @endif
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         @if(session('success'))

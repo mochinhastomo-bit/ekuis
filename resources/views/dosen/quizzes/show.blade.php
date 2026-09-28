@@ -76,17 +76,17 @@
             </div>
             <p class="text-xs text-gray-500 mb-3">Generate token unik per mahasiswa. Mahasiswa login dengan NIM + Token + Kode Kuis untuk langsung masuk ke kuis.</p>
 
-            @error('prodi')
+            @error('prodi_id')
                 <p class="mb-3 text-sm text-red-600">{{ $message }}</p>
             @enderror
 
             <form method="POST" action="{{ route('quizzes.tokens.generate', $quiz) }}" class="flex flex-col sm:flex-row gap-2 mb-4">
                 @csrf
-                <select name="prodi" class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
+                <select name="prodi_id" class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm">
                     <option value="">Semua Prodi</option>
-                    @php $prodiList = \App\Models\User::where('role', 'mahasiswa')->whereNotNull('prodi')->distinct()->orderBy('prodi')->pluck('prodi'); @endphp
-                    @foreach($prodiList as $prodi)
-                        <option value="{{ $prodi }}">{{ $prodi }}</option>
+                    @php $prodiList = \App\Models\Prodi::orderBy('nama')->get(); @endphp
+                    @foreach($prodiList as $p)
+                        <option value="{{ $p->id }}">{{ $p->nama }}</option>
                     @endforeach
                 </select>
                 <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-800 transition cursor-pointer flex items-center justify-center gap-2 shrink-0">
@@ -100,11 +100,11 @@
             @if($quiz->tokens->isNotEmpty())
                 {{-- Mobile: Card layout --}}
                 <div class="sm:hidden space-y-2 max-h-64 overflow-y-auto">
-                    @foreach($quiz->tokens->sortBy('user.name') as $token)
+                    @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
                         <div class="bg-gray-50 rounded-xl p-3 flex items-center justify-between">
                             <div class="min-w-0 flex-1">
-                                <p class="font-medium text-gray-900 text-sm truncate">{{ $token->user->name }}</p>
-                                <p class="text-xs text-gray-500">{{ $token->user->nim }}</p>
+                                <p class="font-medium text-gray-900 text-sm truncate">{{ $token->mahasiswa->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $token->mahasiswa->nim }}</p>
                             </div>
                             <div class="text-right shrink-0 ml-3">
                                 <span class="font-mono text-sm font-bold {{ $token->used_at ? 'text-gray-400 line-through' : 'text-blue-900' }}">{{ $token->token }}</span>
@@ -128,10 +128,10 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @foreach($quiz->tokens->sortBy('user.name') as $token)
+                            @foreach($quiz->tokens->sortBy('mahasiswa.name') as $token)
                                 <tr>
-                                    <td class="px-4 py-2 text-gray-900">{{ $token->user->name }}</td>
-                                    <td class="px-4 py-2 text-gray-500">{{ $token->user->nim }}</td>
+                                    <td class="px-4 py-2 text-gray-900">{{ $token->mahasiswa->name }}</td>
+                                    <td class="px-4 py-2 text-gray-500">{{ $token->mahasiswa->nim }}</td>
                                     <td class="px-4 py-2 text-center font-mono font-bold {{ $token->used_at ? 'text-gray-400 line-through' : 'text-blue-900' }}">{{ $token->token }}</td>
                                     <td class="px-4 py-2 text-center">
                                         @if($token->used_at)
@@ -232,8 +232,8 @@
                     @foreach($quiz->attempts->sortByDesc('score') as $attempt)
                         <a href="{{ route('quiz.result', $attempt) }}" class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center justify-between gap-3 block">
                             <div class="flex-1 min-w-0">
-                                <p class="font-medium text-gray-900 text-sm truncate">{{ $attempt->user->name }}</p>
-                                <p class="text-xs text-gray-400">{{ $attempt->user->nim ?? '-' }} &middot; {{ $attempt->completed_at?->format('d M Y') ?? 'Belum selesai' }}</p>
+                                <p class="font-medium text-gray-900 text-sm truncate">{{ $attempt->mahasiswa->name }}</p>
+                                <p class="text-xs text-gray-400">{{ $attempt->mahasiswa->nim ?? '-' }} &middot; {{ $attempt->completed_at?->format('d M Y') ?? 'Belum selesai' }}</p>
                             </div>
                             <div class="text-right shrink-0">
                                 <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
@@ -258,8 +258,8 @@
                         <tbody class="divide-y divide-gray-100">
                             @foreach($quiz->attempts->sortByDesc('score') as $attempt)
                                 <tr class="hover:bg-gray-50 transition">
-                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $attempt->user->name }}</td>
-                                    <td class="px-4 py-3 text-gray-500">{{ $attempt->user->nim ?? '-' }}</td>
+                                    <td class="px-4 py-3 font-medium text-gray-900">{{ $attempt->mahasiswa->name }}</td>
+                                    <td class="px-4 py-3 text-gray-500">{{ $attempt->mahasiswa->nim ?? '-' }}</td>
                                     <td class="px-4 py-3 text-center">
                                         <span class="font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">
                                             {{ $attempt->score }}/{{ $attempt->total_questions }}

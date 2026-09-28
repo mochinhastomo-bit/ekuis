@@ -14,16 +14,16 @@
         <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari NIM atau nama..."
                 class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
-            <select name="prodi" class="rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+            <select name="prodi_id" class="rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
                 <option value="">Semua Prodi</option>
                 @foreach($prodis as $p)
-                    <option value="{{ $p }}" {{ request('prodi') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                    <option value="{{ $p->id }}" {{ request('prodi_id') == $p->id ? 'selected' : '' }}>{{ $p->nama }}</option>
                 @endforeach
             </select>
             <button type="submit" class="bg-blue-900 text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-800 transition cursor-pointer text-sm">
                 Filter
             </button>
-            @if(request('search') || request('prodi'))
+            @if(request('search') || request('prodi_id'))
                 <a href="{{ route('mahasiswa.index') }}" class="px-4 py-2 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition text-sm text-center">
                     Reset
                 </a>
@@ -39,7 +39,7 @@
                     <h3 class="font-semibold text-gray-900 text-sm">{{ $mhs->name }}</h3>
                     <span class="font-mono text-xs bg-blue-50 text-blue-900 px-2 py-0.5 rounded-lg">{{ $mhs->nim }}</span>
                 </div>
-                <p class="text-xs text-gray-500">{{ $mhs->prodi ?? '-' }}</p>
+                <p class="text-xs text-gray-500">{{ $mhs->prodi?->nama ?? '-' }}</p>
             </div>
         @empty
             <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
@@ -66,7 +66,7 @@
                         <td class="px-4 py-3 text-gray-400">{{ $mahasiswas->firstItem() + $loop->index }}</td>
                         <td class="px-4 py-3 font-mono text-blue-900 font-medium">{{ $mhs->nim }}</td>
                         <td class="px-4 py-3 text-gray-900">{{ $mhs->name }}</td>
-                        <td class="px-4 py-3 text-gray-600">{{ $mhs->prodi ?? '-' }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $mhs->prodi?->nama ?? '-' }}</td>
                     </tr>
                     @empty
                     <tr>

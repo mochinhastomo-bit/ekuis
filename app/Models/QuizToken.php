@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['quiz_id', 'user_id', 'token', 'used_at'])]
+#[Fillable(['quiz_id', 'mahasiswa_id', 'token', 'used_at'])]
 class QuizToken extends Model
 {
     protected function casts(): array
@@ -21,8 +21,8 @@ class QuizToken extends Model
         return $this->belongsTo(Quiz::class);
     }
 
-    public function user(): BelongsTo
+    public function mahasiswa(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Mahasiswa::class);
     }
 }

@@ -12,18 +12,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => redirect()->route('login'));
 
 // Auth
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-});
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
-
-// Dashboard
+// Dosen Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 
 // Dosen
-Route::middleware(['auth', 'role:dosen'])->group(function () {
+Route::middleware('auth')->group(function () {
     // Quiz CRUD
     Route::get('/quizzes/create', [QuizController::class, 'create'])->name('quizzes.create');
     Route::post('/quizzes', [QuizController::class, 'store'])->name('quizzes.store');
@@ -48,16 +45,17 @@ Route::middleware(['auth', 'role:dosen'])->group(function () {
     Route::post('/master-data/{type}', [MasterDataController::class, 'store'])->name('master-data.store');
     Route::delete('/master-data/{type}/{id}', [MasterDataController::class, 'destroy'])->name('master-data.destroy');
 
-    // Mahasiswa
+    // Mahasiswa List
     Route::get('/mahasiswa', [MahasiswaController::class, 'index'])->name('mahasiswa.index');
 });
 
-// Mahasiswa - Quiz Play
-Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
+// Mahasiswa
+Route::middleware('mahasiswa')->group(function () {
+    Route::get('/mahasiswa/dashboard', [QuizPlayController::class, 'dashboard'])->name('mahasiswa.dashboard');
     Route::post('/quiz/join', [QuizPlayController::class, 'join'])->name('quiz.join');
     Route::get('/quiz/{quiz}/play', [QuizPlayController::class, 'play'])->name('quiz.play');
     Route::post('/quiz/{quiz}/attempt/{attempt}/answer', [QuizPlayController::class, 'answer'])->name('quiz.answer');
 });
 
 // Result - accessible by both dosen and mahasiswa
-Route::get('/quiz/result/{attempt}', [QuizPlayController::class, 'result'])->middleware('auth')->name('quiz.result');
+Route::get('/quiz/result/{attempt}', [QuizPlayController::class, 'result'])->name('quiz.result');

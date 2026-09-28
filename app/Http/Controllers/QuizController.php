@@ -6,9 +6,9 @@ use App\Models\Kelas;
 use App\Models\Matakuliah;
 use App\Models\Periode;
 use App\Models\Prodi;
+use App\Models\Mahasiswa;
 use App\Models\Quiz;
 use App\Models\QuizToken;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -38,7 +38,7 @@ class QuizController extends Controller
     public function show(Quiz $quiz)
     {
         $this->authorizeQuiz($quiz);
-        $quiz->load(['questions.options', 'attempts.user', 'periode', 'prodi', 'matakuliah', 'kelas', 'tokens.user']);
+        $quiz->load(['questions.options', 'attempts.mahasiswa', 'periode', 'prodi', 'matakuliah', 'kelas', 'tokens.mahasiswa']);
 
         return view('dosen.quizzes.show', compact('quiz'));
     }
@@ -83,29 +83,29 @@ class QuizController extends Controller
         $this->authorizeQuiz($quiz);
 
         $request->validate([
-            'prodi' => ['nullable', 'string'],
+            'prodi_id' => ['nullable', 'exists:prodis,id'],
         ]);
 
-        $query = User::where('role', 'mahasiswa');
-        if ($request->prodi) {
-            $query->where('prodi', $request->prodi);
+        $query = Mahasiswa::query();
+        if ($request->prodi_id) {
+            $query->where('prodi_id', $request->prodi_id);
         }
         $students = $query->get();
 
         if ($students->isEmpty()) {
-            return back()->withErrors(['prodi' => 'Tidak ada mahasiswa ditemukan.']);
+            return back()->withErrors(['prodi_id' => 'Tidak ada mahasiswa ditemukan.']);
         }
 
         $generated = 0;
         foreach ($students as $student) {
             $exists = QuizToken::where('quiz_id', $quiz->id)
-                ->where('user_id', $student->id)
+                ->where('mahasiswa_id', $student->id)
                 ->exists();
 
             if (! $exists) {
                 QuizToken::create([
                     'quiz_id' => $quiz->id,
-                    'user_id' => $student->id,
+                    'mahasiswa_id' => $student->id,
                     'token' => strtoupper(Str::random(8)),
                 ]);
                 $generated++;

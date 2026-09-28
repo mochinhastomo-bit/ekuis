@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Mahasiswa;
+use App\Models\Prodi;
 use Illuminate\Http\Request;
 
 class MahasiswaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'mahasiswa')->orderBy('prodi')->orderBy('nim');
+        $query = Mahasiswa::with('prodi')->orderBy('name');
 
-        if ($request->filled('prodi')) {
-            $query->where('prodi', $request->prodi);
+        if ($request->filled('prodi_id')) {
+            $query->where('prodi_id', $request->prodi_id);
         }
 
         if ($request->filled('search')) {
@@ -24,7 +25,7 @@ class MahasiswaController extends Controller
         }
 
         $mahasiswas = $query->paginate(50)->withQueryString();
-        $prodis = User::where('role', 'mahasiswa')->distinct()->pluck('prodi')->sort()->values();
+        $prodis = Prodi::orderBy('nama')->get();
 
         return view('dosen.mahasiswa.index', compact('mahasiswas', 'prodis'));
     }
