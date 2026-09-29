@@ -38,7 +38,7 @@
                         :placeholder="withQuiz ? 'Masukkan token dari dosen' : 'Masukkan password'"
                         :class="withQuiz ? 'uppercase tracking-widest font-semibold' : ''"
                         class="!pl-10 w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800"
-                        maxlength="8">
+                        :maxlength="withQuiz ? 4 : 255">
                 </div>
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>

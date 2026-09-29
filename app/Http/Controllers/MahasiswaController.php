@@ -58,7 +58,7 @@ class MahasiswaController extends Controller
 
         $tokens = [];
         Mahasiswa::whereNull('token')->each(function ($mhs) use (&$tokens) {
-            $token = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+            $token = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
             $mhs->update(['token' => $token]);
             $tokens[$mhs->id] = $token;
         });
@@ -71,7 +71,7 @@ class MahasiswaController extends Controller
 
     public function regenerateToken(Mahasiswa $mahasiswa)
     {
-        $token = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+        $token = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         $mahasiswa->update(['token' => $token]);
 
         return response()->json([
