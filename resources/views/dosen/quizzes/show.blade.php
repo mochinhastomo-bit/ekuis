@@ -70,11 +70,19 @@
                             <p class="font-semibold text-green-900 text-sm">{{ $activeSession->name }}</p>
                             <p class="text-xs text-green-700 mt-0.5">Dimulai: {{ $activeSession->started_at->format('d M Y H:i') }} &middot; {{ $activeSession->attempts_count }} peserta</p>
                         </div>
-                        <form method="POST" action="{{ route('quizzes.sessions.end', [$quiz, $activeSession]) }}"
-                            onsubmit="return confirm('Akhiri sesi ini? Mahasiswa tidak bisa lagi mengerjakan kuis di sesi ini.')">
-                            @csrf
-                            <button type="submit" class="text-xs font-semibold text-red-600 hover:text-red-800 bg-white border border-red-200 px-3 py-1.5 rounded-lg cursor-pointer">Akhiri Sesi</button>
-                        </form>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('quizzes.sessions.results', [$quiz, $activeSession]) }}" class="text-xs font-semibold text-blue-900 hover:text-blue-700 bg-white border border-blue-200 px-3 py-1.5 rounded-lg inline-flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                Lihat Hasil
+                            </a>
+                            <form method="POST" action="{{ route('quizzes.sessions.end', [$quiz, $activeSession]) }}"
+                                onsubmit="return confirm('Akhiri sesi ini? Mahasiswa tidak bisa lagi mengerjakan kuis di sesi ini.')">
+                                @csrf
+                                <button type="submit" class="text-xs font-semibold text-red-600 hover:text-red-800 bg-white border border-red-200 px-3 py-1.5 rounded-lg cursor-pointer">Akhiri Sesi</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             @endif

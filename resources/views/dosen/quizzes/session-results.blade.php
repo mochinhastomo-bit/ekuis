@@ -31,6 +31,52 @@
             </div>
         </div>
 
+        {{-- Status Ringkasan (sesi aktif) --}}
+        @if($session->is_active && $session->attempts->isNotEmpty())
+            @php
+                $selesai = $session->attempts->whereNotNull('completed_at')->count();
+                $belumSelesai = $session->attempts->whereNull('completed_at')->count();
+                $total = $session->attempts->count();
+            @endphp
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 shadow-sm">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h2 class="font-bold text-amber-900 text-sm sm:text-base">Status Pengerjaan</h2>
+                </div>
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-white rounded-xl p-3 border border-amber-100">
+                        <p class="text-2xl font-bold text-gray-900">{{ $total }}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Total Peserta</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 border border-green-100">
+                        <p class="text-2xl font-bold text-green-600">{{ $selesai }}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Selesai</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-3 border border-red-100">
+                        <p class="text-2xl font-bold {{ $belumSelesai > 0 ? 'text-red-600' : 'text-gray-400' }}">{{ $belumSelesai }}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">Sedang Mengerjakan</p>
+                    </div>
+                </div>
+                @if($belumSelesai > 0)
+                    <p class="text-xs text-amber-700 mt-3 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Masih ada {{ $belumSelesai }} mahasiswa yang belum selesai mengerjakan kuis.
+                    </p>
+                @else
+                    <p class="text-xs text-green-700 mt-3 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Semua mahasiswa sudah selesai mengerjakan kuis. Aman untuk mengakhiri sesi.
+                    </p>
+                @endif
+            </div>
+        @endif
+
         {{-- Hasil Peserta --}}
         <div class="mb-4 sm:mb-6">
             <div class="flex items-center gap-2 mb-3 sm:mb-4">
@@ -60,8 +106,15 @@
                                 </div>
                             </div>
                             <div class="text-right shrink-0">
-                                <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
-                                <p class="text-xs text-gray-400">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
+                                @if($attempt->completed_at)
+                                    <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
+                                    <p class="text-xs text-gray-400">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                        Mengerjakan
+                                    </span>
+                                @endif
                             </div>
                         </a>
                     @endforeach
@@ -92,8 +145,15 @@
                                             ({{ $attempt->scorePercentage() }}%)
                                         </span>
                                     </td>
-                                    <td class="px-4 py-3 text-center text-gray-500">
-                                        {{ $attempt->completed_at?->format('d M Y H:i') ?? 'Belum selesai' }}
+                                    <td class="px-4 py-3 text-center">
+                                        @if($attempt->completed_at)
+                                            <span class="text-gray-500">{{ $attempt->completed_at->format('d M Y H:i') }}</span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-amber-600 font-medium">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                                Sedang mengerjakan
+                                            </span>
+                                        @endif
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         <a href="{{ route('quiz.result', $attempt) }}" class="text-blue-900 hover:text-blue-700 text-xs font-semibold">Detail</a>
