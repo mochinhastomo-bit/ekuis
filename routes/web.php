@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/quizzes/{quiz}/sessions', [QuizController::class, 'startSession'])->name('quizzes.sessions.start');
     Route::post('/quizzes/{quiz}/sessions/{session}/end', [QuizController::class, 'endSession'])->name('quizzes.sessions.end');
     Route::get('/quizzes/{quiz}/sessions/{session}/results', [QuizController::class, 'sessionResults'])->name('quizzes.sessions.results');
+    Route::delete('/quizzes/{quiz}/sessions/{session}/attempts/{attempt}', [QuizController::class, 'deleteAttempt'])->name('quizzes.sessions.attempts.destroy');
 
     // Questions
     Route::get('/quizzes/{quiz}/questions/create', [QuestionController::class, 'create'])->name('questions.create');

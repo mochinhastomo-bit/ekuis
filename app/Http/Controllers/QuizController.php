@@ -6,6 +6,7 @@ use App\Models\Matakuliah;
 use App\Models\Periode;
 use App\Models\Prodi;
 use App\Models\Quiz;
+use App\Models\QuizAttempt;
 use App\Models\QuizSession;
 use Illuminate\Http\Request;
 
@@ -120,6 +121,18 @@ class QuizController extends Controller
         $quiz->load(['periode', 'prodi', 'matakuliah']);
 
         return view('dosen.quizzes.session-results', compact('quiz', 'session'));
+    }
+
+    public function deleteAttempt(Quiz $quiz, QuizSession $session, QuizAttempt $attempt)
+    {
+        $this->authorizeQuiz($quiz);
+        abort_unless($session->quiz_id === $quiz->id && $attempt->quiz_session_id === $session->id, 404);
+
+        $name = $attempt->mahasiswa?->name ?? 'Peserta';
+        $attempt->answers()->delete();
+        $attempt->delete();
+
+        return back()->with('success', "Data peserta \"{$name}\" berhasil dihapus.");
     }
 
     private function authorizeQuiz(Quiz $quiz): void
