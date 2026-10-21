@@ -24,10 +24,18 @@
         </div>
     </div>
 
-    {{-- Search --}}
+    {{-- Search & Filter --}}
     <div class="bg-white rounded-2xl border border-gray-200 p-3 sm:p-4 mb-4 sm:mb-6 shadow-sm">
-        <input type="text" x-model="search" placeholder="Cari NIM atau nama..."
-            class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+        <div class="flex flex-col sm:flex-row gap-2">
+            <input type="text" x-model="search" placeholder="Cari NIM atau nama..."
+                class="flex-1 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+            <select x-model="filterProdi" class="sm:w-56 rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 text-sm py-2">
+                <option value="">Semua Prodi</option>
+                @foreach($prodis as $p)
+                    <option value="{{ $p->id }}">{{ $p->nama }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
 
     {{-- Mobile: Cards --}}
@@ -183,9 +191,11 @@
 <script>
 function mahasiswaPage() {
     const searchMap = @json($mahasiswas->mapWithKeys(fn ($m) => [$m->id => strtolower($m->name . ' ' . $m->nim)]));
+    const prodiMap = @json($mahasiswas->mapWithKeys(fn ($m) => [$m->id => (string) ($m->prodi_id ?? '')]));
 
     return {
         search: '',
+        filterProdi: '',
         showModal: false,
         submitting: false,
         generating: false,
@@ -197,6 +207,7 @@ function mahasiswaPage() {
         csrfToken: document.querySelector('meta[name="csrf-token"]').content,
 
         matchSearch(id) {
+            if (this.filterProdi && prodiMap[id] !== this.filterProdi) return false;
             if (!this.search) return true;
             const text = searchMap[id] || '';
             return text.includes(this.search.toLowerCase());
