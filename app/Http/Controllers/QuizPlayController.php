@@ -154,9 +154,12 @@ class QuizPlayController extends Controller
             403
         );
 
-        $attempt->load(['quiz', 'session', 'answers.question', 'answers.option']);
+        $attempt->load(['quiz', 'session', 'answers.question.options', 'answers.option']);
 
-        return view('mahasiswa.result', compact('attempt'));
+        $sessionActive = $attempt->session && $attempt->session->is_active;
+        $isMahasiswa = (bool) $mahasiswaId;
+
+        return view('mahasiswa.result', compact('attempt', 'sessionActive', 'isMahasiswa'));
     }
 
     public function dashboard()
