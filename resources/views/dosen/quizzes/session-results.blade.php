@@ -120,7 +120,7 @@
                             </a>
                             <div class="flex justify-end mt-2 pt-2 border-t border-gray-100">
                                 <form method="POST" action="{{ route('quizzes.sessions.attempts.destroy', [$quiz, $session, $attempt]) }}"
-                                    onsubmit="return confirm('Hapus data peserta {{ $attempt->mahasiswa->name }}?')">
+                                    onsubmit="return confirm('Hapus data peserta ' + this.dataset.name + '?')" data-name="{{ $attempt->mahasiswa->name }}">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer flex items-center gap-1">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@
                                         <div class="flex items-center justify-center gap-2">
                                             <a href="{{ route('quiz.result', $attempt) }}" class="text-blue-900 hover:text-blue-700 text-xs font-semibold">Detail</a>
                                             <form method="POST" action="{{ route('quizzes.sessions.attempts.destroy', [$quiz, $session, $attempt]) }}"
-                                                onsubmit="return confirm('Hapus data peserta {{ $attempt->mahasiswa->name }}?')">
+                                                onsubmit="return confirm('Hapus data peserta ' + this.dataset.name + '?')" data-name="{{ $attempt->mahasiswa->name }}">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="text-red-400 hover:text-red-600 cursor-pointer" title="Hapus peserta">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
