@@ -97,26 +97,40 @@
                 {{-- Mobile: Card layout --}}
                 <div class="sm:hidden space-y-2">
                     @foreach($session->attempts->sortByDesc('score') as $ri => $attempt)
-                        <a href="{{ route('quiz.result', $attempt) }}" class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm flex items-center justify-between gap-3 block">
-                            <div class="flex items-center gap-2 flex-1 min-w-0">
-                                <span class="shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold">{{ $ri + 1 }}</span>
-                                <div class="min-w-0">
-                                    <p class="font-medium text-gray-900 text-sm truncate">{{ $attempt->mahasiswa->name }}</p>
-                                    <p class="text-xs text-gray-400">{{ $attempt->mahasiswa->nim }}</p>
+                        <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-sm">
+                            <a href="{{ route('quiz.result', $attempt) }}" class="flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2 flex-1 min-w-0">
+                                    <span class="shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs font-bold">{{ $ri + 1 }}</span>
+                                    <div class="min-w-0">
+                                        <p class="font-medium text-gray-900 text-sm truncate">{{ $attempt->mahasiswa->name }}</p>
+                                        <p class="text-xs text-gray-400">{{ $attempt->mahasiswa->nim }}</p>
+                                    </div>
                                 </div>
+                                <div class="text-right shrink-0">
+                                    @if($attempt->completed_at)
+                                        <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
+                                        <p class="text-xs text-gray-400">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                            Mengerjakan
+                                        </span>
+                                    @endif
+                                </div>
+                            </a>
+                            <div class="flex justify-end mt-2 pt-2 border-t border-gray-100">
+                                <form method="POST" action="{{ route('quizzes.sessions.attempts.destroy', [$quiz, $session, $attempt]) }}"
+                                    onsubmit="return confirm('Hapus data peserta {{ $attempt->mahasiswa->name }}?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        Hapus
+                                    </button>
+                                </form>
                             </div>
-                            <div class="text-right shrink-0">
-                                @if($attempt->completed_at)
-                                    <span class="text-lg font-bold {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
-                                    <p class="text-xs text-gray-400">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
-                                @else
-                                    <span class="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                        Mengerjakan
-                                    </span>
-                                @endif
-                            </div>
-                        </a>
+                        </div>
                     @endforeach
                 </div>
 
@@ -156,7 +170,18 @@
                                         @endif
                                     </td>
                                     <td class="px-4 py-3 text-center">
-                                        <a href="{{ route('quiz.result', $attempt) }}" class="text-blue-900 hover:text-blue-700 text-xs font-semibold">Detail</a>
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="{{ route('quiz.result', $attempt) }}" class="text-blue-900 hover:text-blue-700 text-xs font-semibold">Detail</a>
+                                            <form method="POST" action="{{ route('quizzes.sessions.attempts.destroy', [$quiz, $session, $attempt]) }}"
+                                                onsubmit="return confirm('Hapus data peserta {{ $attempt->mahasiswa->name }}?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="text-red-400 hover:text-red-600 cursor-pointer" title="Hapus peserta">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
