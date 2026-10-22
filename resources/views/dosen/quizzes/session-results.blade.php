@@ -108,13 +108,9 @@
                                 </div>
                                 <div class="text-right shrink-0">
                                     @if($attempt->completed_at)
-                                        <div x-data="{ show: false }" class="relative" @click.stop>
-                                            <span @mouseenter="show = true" @mouseleave="show = false" @touchstart="show = !show"
-                                                class="text-lg font-bold blur-sm hover:blur-none transition-all duration-200 cursor-pointer select-none {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
+                                        <div>
+                                            <span class="text-lg font-bold blur-sm hover:blur-none transition-all duration-200 cursor-pointer select-none {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">{{ $attempt->scorePercentage() }}%</span>
                                             <p class="text-xs text-gray-400 blur-sm hover:blur-none transition-all duration-200">{{ $attempt->score }}/{{ $attempt->total_questions }}</p>
-                                            <div x-show="show" x-transition class="absolute z-10 right-0 mt-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-                                                {{ $attempt->score }}/{{ $attempt->total_questions }} ({{ $attempt->scorePercentage() }}%)
-                                            </div>
                                         </div>
                                     @else
                                         <span class="inline-flex items-center gap-1 text-xs text-amber-600 font-medium">
@@ -165,17 +161,11 @@
                                     <td class="px-3 py-3 text-center text-gray-400">{{ $ri + 1 }}</td>
                                     <td class="px-4 py-3 font-medium text-gray-900">{{ $attempt->mahasiswa->name }}</td>
                                     <td class="px-4 py-3 text-gray-500">{{ $attempt->mahasiswa->nim }}</td>
-                                    <td class="px-4 py-3 text-center" x-data="{ show: false }">
-                                        <div class="relative inline-block">
-                                            <span @mouseenter="show = true" @mouseleave="show = false"
-                                                class="font-bold blur-sm hover:blur-none transition-all duration-200 cursor-pointer select-none {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">
-                                                {{ $attempt->score }}/{{ $attempt->total_questions }}
-                                                ({{ $attempt->scorePercentage() }}%)
-                                            </span>
-                                            <div x-show="show" x-transition class="absolute z-10 left-1/2 -translate-x-1/2 mt-1 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-lg">
-                                                {{ $attempt->score }}/{{ $attempt->total_questions }} ({{ $attempt->scorePercentage() }}%)
-                                            </div>
-                                        </div>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="font-bold blur-sm hover:blur-none transition-all duration-200 cursor-pointer select-none {{ $attempt->scorePercentage() >= 70 ? 'text-green-600' : ($attempt->scorePercentage() >= 50 ? 'text-yellow-600' : 'text-red-600') }}">
+                                            {{ $attempt->score }}/{{ $attempt->total_questions }}
+                                            ({{ $attempt->scorePercentage() }}%)
+                                        </span>
                                     </td>
                                     <td class="px-4 py-3 text-center text-gray-500">
                                         {{ $attempt->started_at?->format('d M Y H:i') ?? '-' }}
