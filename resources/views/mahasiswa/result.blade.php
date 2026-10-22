@@ -47,7 +47,7 @@
             @endif
         </div>
 
-        @if($isMahasiswa && $sessionActive)
+        @if($isMahasiswa && $quizHasActiveSession)
             {{-- Sesi masih aktif: sembunyikan review jawaban --}}
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-8 text-center shadow-sm">
                 <svg class="w-12 h-12 text-amber-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

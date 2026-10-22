@@ -37,12 +37,15 @@ class QuizPlayController extends Controller
 
         $mahasiswa = $this->mahasiswa();
         $existing = QuizAttempt::where('quiz_id', $quiz->id)
-            ->where('quiz_session_id', $activeSession->id)
             ->where('mahasiswa_id', $mahasiswa->id)
             ->first();
 
         if ($existing && $existing->completed_at) {
-            return back()->withErrors(['code' => 'Anda sudah mengerjakan kuis ini di sesi ini.']);
+            return back()->withErrors(['code' => 'Anda sudah pernah mengerjakan kuis ini.']);
+        }
+
+        if ($existing && $existing->quiz_session_id !== $activeSession->id) {
+            return back()->withErrors(['code' => 'Anda sudah terdaftar di sesi lain untuk kuis ini.']);
         }
 
         session(['quiz_session_id' => $activeSession->id]);
@@ -154,12 +157,12 @@ class QuizPlayController extends Controller
             403
         );
 
-        $attempt->load(['quiz', 'session', 'answers.question.options', 'answers.option']);
+        $attempt->load(['quiz.sessions', 'session', 'answers.question.options', 'answers.option']);
 
-        $sessionActive = $attempt->session && $attempt->session->is_active;
+        $quizHasActiveSession = $attempt->quiz->sessions->contains('is_active', true);
         $isMahasiswa = (bool) $mahasiswaId;
 
-        return view('mahasiswa.result', compact('attempt', 'sessionActive', 'isMahasiswa'));
+        return view('mahasiswa.result', compact('attempt', 'quizHasActiveSession', 'isMahasiswa'));
     }
 
     public function dashboard()
