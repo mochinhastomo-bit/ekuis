@@ -54,7 +54,7 @@
                         </svg>
                     </span>
                     <input type="text" name="kode_kuis" id="kode_kuis" value="{{ old('kode_kuis') }}"
-                        placeholder="Contoh: 7FA9AX"
+                        placeholder="Masukkan Kode Kuis"
                         class="!pl-10 w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800 uppercase tracking-widest font-semibold"
                         maxlength="6">
                 </div>
