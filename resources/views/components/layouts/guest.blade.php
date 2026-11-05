@@ -32,7 +32,7 @@
             </div>
 
             <h1 class="text-4xl font-bold text-white mb-3">Mochin-Kuis</h1>
-            <p class="text-blue-200 text-lg mb-8">Media Ujian Online Perkuliahan</p>
+            <p class="text-blue-200 text-lg mb-8">Media Ujian Online</p>
 
             <div class="space-y-4 text-left max-w-xs mx-auto">
                 <div class="flex items-start gap-3">
@@ -65,7 +65,7 @@
                     </div>
                     <div>
                         <p class="text-white font-medium text-sm">Soal Acak</p>
-                        <p class="text-blue-300 text-xs">Urutan soal berbeda tiap mahasiswa</p>
+                        <p class="text-blue-300 text-xs">Urutan soal berbeda tiap peserta</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                     </svg>
                 </div>
                 <h1 class="text-xl font-bold text-gray-900">Mochin-Kuis</h1>
-                <p class="text-gray-500 text-xs">Media Ujian Online Perkuliahan</p>
+                <p class="text-gray-500 text-xs">Media Ujian Online</p>
             </div>
             {{ $slot }}
         </div>

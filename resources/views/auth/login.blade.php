@@ -26,7 +26,7 @@
 
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1.5">
-                    <span x-text="withQuiz ? 'Token Mahasiswa' : 'Password'">Password</span>
+                    <span x-text="withQuiz ? 'Token Peserta' : 'Password'">Password</span>
                 </label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -35,7 +35,7 @@
                         </svg>
                     </span>
                     <input :type="withQuiz ? 'text' : 'password'" name="password" id="password" required
-                        :placeholder="withQuiz ? 'Masukkan token dari dosen' : 'Masukkan password'"
+                        :placeholder="withQuiz ? 'Masukkan token dari penguji' : 'Masukkan password'"
                         :class="withQuiz ? 'uppercase tracking-widest font-semibold' : ''"
                         class="!pl-10 w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-800 focus:ring-blue-800"
                         :maxlength="withQuiz ? 4 : 255">
