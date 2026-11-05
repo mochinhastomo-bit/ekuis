@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/quizzes/{quiz}/edit', [QuizController::class, 'edit'])->name('quizzes.edit');
     Route::put('/quizzes/{quiz}', [QuizController::class, 'update'])->name('quizzes.update');
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('quizzes.destroy');
+    Route::post('/quizzes/{quiz}/duplicate', [QuizController::class, 'duplicate'])->name('quizzes.duplicate');
 
     // Mahasiswa Tokens
     Route::post('/mahasiswa/tokens/generate-all', [MahasiswaController::class, 'generateAllTokens'])->name('mahasiswa.tokens.generate-all');

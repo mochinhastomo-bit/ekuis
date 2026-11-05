@@ -135,6 +135,31 @@ class QuizController extends Controller
         return back()->with('success', "Data peserta \"{$name}\" berhasil dihapus.");
     }
 
+    public function duplicate(Quiz $quiz)
+    {
+        $this->authorizeQuiz($quiz);
+        $quiz->load('questions.options');
+
+        $newQuiz = $quiz->replicate(['code']);
+        $newQuiz->title = 'Salinan - ' . $quiz->title;
+        $newQuiz->is_active = false;
+        $newQuiz->save();
+
+        foreach ($quiz->questions as $question) {
+            $newQuestion = $question->replicate();
+            $newQuestion->quiz_id = $newQuiz->id;
+            $newQuestion->save();
+
+            foreach ($question->options as $option) {
+                $newOption = $option->replicate();
+                $newOption->question_id = $newQuestion->id;
+                $newOption->save();
+            }
+        }
+
+        return redirect()->route('quizzes.show', $newQuiz)->with('success', "Kuis berhasil diduplikat sebagai \"{$newQuiz->title}\" dengan kode {$newQuiz->code}.");
+    }
+
     private function authorizeQuiz(Quiz $quiz): void
     {
         abort_unless($quiz->user_id === auth()->id(), 403);
