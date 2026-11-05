@@ -103,6 +103,11 @@
                 <span class="shrink-0 w-8 h-8 rounded-lg bg-blue-900 text-white flex items-center justify-center text-sm font-bold">{{ $currentNumber }}</span>
                 <p class="text-sm sm:text-lg text-gray-900 font-medium leading-relaxed">{{ $question->question_text }}</p>
             </div>
+            @if($question->image)
+                <div class="mt-3 ml-11">
+                    <img src="{{ asset('storage/' . $question->image) }}" alt="Gambar soal" class="max-h-64 rounded-xl border border-gray-200">
+                </div>
+            @endif
         </div>
 
         {{-- Options --}}

@@ -9,6 +9,7 @@ use App\Models\Quiz;
 use App\Models\QuizAttempt;
 use App\Models\QuizSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class QuizController extends Controller
 {
@@ -148,6 +149,14 @@ class QuizController extends Controller
         foreach ($quiz->questions as $question) {
             $newQuestion = $question->replicate();
             $newQuestion->quiz_id = $newQuiz->id;
+
+            if ($question->image && Storage::disk('public')->exists($question->image)) {
+                $ext = pathinfo($question->image, PATHINFO_EXTENSION);
+                $newPath = 'questions/' . uniqid() . '.' . $ext;
+                Storage::disk('public')->copy($question->image, $newPath);
+                $newQuestion->image = $newPath;
+            }
+
             $newQuestion->save();
 
             foreach ($question->options as $option) {

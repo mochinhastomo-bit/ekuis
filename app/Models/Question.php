@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['question_text', 'time_limit', 'order'])]
+#[Fillable(['question_text', 'image', 'time_limit', 'order'])]
 class Question extends Model
 {
     public function quiz(): BelongsTo

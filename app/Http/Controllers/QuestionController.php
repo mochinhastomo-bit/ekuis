@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Question;
 use App\Models\Quiz;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class QuestionController extends Controller
 {
@@ -21,14 +22,20 @@ class QuestionController extends Controller
 
         $validated = $request->validate([
             'question_text' => ['required', 'string'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'time_limit' => ['required', 'integer', 'min:5', 'max:300'],
             'options' => ['required', 'array', 'min:2', 'max:6'],
             'options.*.text' => ['required', 'string', 'max:500'],
             'correct_option' => ['required', 'integer', 'min:0'],
         ]);
 
+        $imagePath = $request->hasFile('image')
+            ? $request->file('image')->store('questions', 'public')
+            : null;
+
         $question = $quiz->questions()->create([
             'question_text' => $validated['question_text'],
+            'image' => $imagePath,
             'time_limit' => $validated['time_limit'],
             'order' => $quiz->questions()->count(),
         ]);
@@ -57,16 +64,31 @@ class QuestionController extends Controller
 
         $validated = $request->validate([
             'question_text' => ['required', 'string'],
+            'image' => ['nullable', 'image', 'max:2048'],
             'time_limit' => ['required', 'integer', 'min:5', 'max:300'],
             'options' => ['required', 'array', 'min:2', 'max:6'],
             'options.*.text' => ['required', 'string', 'max:500'],
             'correct_option' => ['required', 'integer', 'min:0'],
         ]);
 
-        $question->update([
+        $data = [
             'question_text' => $validated['question_text'],
             'time_limit' => $validated['time_limit'],
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($question->image) {
+                Storage::disk('public')->delete($question->image);
+            }
+            $data['image'] = $request->file('image')->store('questions', 'public');
+        }
+
+        if ($request->boolean('remove_image') && $question->image) {
+            Storage::disk('public')->delete($question->image);
+            $data['image'] = null;
+        }
+
+        $question->update($data);
 
         $question->options()->delete();
 
